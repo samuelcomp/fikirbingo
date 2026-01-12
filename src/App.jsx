@@ -6,6 +6,7 @@ import GameBoard from './components/GameBoard';
 import WalletDashboard from './components/WalletDashboard';
 import ProfilePage from './components/ProfilePage';
 import Leaderboard from './components/Leaderboard';
+import RegisterPage from './components/RegisterPage';
 import { Home, Trophy as TrophyIcon, Wallet, User as UserIcon, Gamepad2 } from 'lucide-react';
 import { translations } from './translations';
 import './index.css';
@@ -21,6 +22,7 @@ function App() {
     const [branding, setBranding] = useState({ appName: 'Fikir Bingo', appLogo: null });
     const [selectedCartelas, setSelectedCartelas] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [mustRegister, setMustRegister] = useState(false);
     const [lang, setLang] = useState('en');
 
     const t = translations[lang];
@@ -39,6 +41,7 @@ function App() {
                 const authRes = await axios.post(`${API_URL}/api/auth`, { initData });
                 localStorage.setItem('userToken', authRes.data.token);
                 setUser(authRes.data.user);
+                setMustRegister(authRes.data.mustRegister);
             } else {
                 fetchUserProfile();
             }
@@ -98,54 +101,67 @@ function App() {
     return (
         <div className="app-main">
             <div className="content-area">
-                {view === 'landing' && (
-                    <LandingPage
-                        onPlay={handlePlay}
-                        appName={branding.appName}
-                        appLogo={branding.appLogo}
+                {mustRegister ? (
+                    <RegisterPage
+                        API_URL={API_URL}
                         t={t}
+                        onRegisterSuccess={() => {
+                            setMustRegister(false);
+                            initApp();
+                        }}
                     />
-                )}
-                {view === 'leaderboard' && (
-                    <Leaderboard t={t} />
-                )}
-                {view === 'lobby' && (
-                    <CartelaSelection
-                        user={user}
-                        stake={stake}
-                        userBalance={user?.playBalance || 0}
-                        onGameStart={handleGameStart}
-                        t={t}
-                    />
-                )}
-                {view === 'game' && (
-                    <GameBoard
-                        user={user}
-                        roomId={`room-${stake}`}
-                        selectedCartelas={selectedCartelas}
-                        onGameOver={handleGameOver}
-                        t={t}
-                    />
-                )}
-                {view === 'wallet' && (
-                    <WalletDashboard
-                        user={user}
-                        onUpdateUser={fetchUserProfile}
-                        t={t}
-                    />
-                )}
-                {view === 'profile' && (
-                    <ProfilePage
-                        user={user}
-                        lang={lang}
-                        onToggleLang={() => setLang(lang === 'en' ? 'am' : 'en')}
-                        onLogout={handleLogout}
-                        t={t}
-                    />
+                ) : (
+                    <>
+                        {view === 'landing' && (
+                            <LandingPage
+                                onPlay={handlePlay}
+                                appName={branding.appName}
+                                appLogo={branding.appLogo}
+                                t={t}
+                            />
+                        )}
+                        {view === 'leaderboard' && (
+                            <Leaderboard t={t} />
+                        )}
+                        {view === 'lobby' && (
+                            <CartelaSelection
+                                user={user}
+                                stake={stake}
+                                userBalance={user?.playBalance || 0}
+                                onGameStart={handleGameStart}
+                                t={t}
+                            />
+                        )}
+                        {view === 'game' && (
+                            <GameBoard
+                                user={user}
+                                roomId={`room-${stake}`}
+                                selectedCartelas={selectedCartelas}
+                                onGameOver={handleGameOver}
+                                t={t}
+                            />
+                        )}
+                        {view === 'wallet' && (
+                            <WalletDashboard
+                                user={user}
+                                onUpdateUser={fetchUserProfile}
+                                t={t}
+                            />
+                        )}
+                        {view === 'profile' && (
+                            <ProfilePage
+                                user={user}
+                                lang={lang}
+                                onToggleLang={() => setLang(lang === 'en' ? 'am' : 'en')}
+                                onLogout={handleLogout}
+                                t={t}
+                            />
+                        )}
+                    </>
                 )}
             </div>
 
-            {view !== 'game' && (
+            {!mustRegister && view !== 'game' && (
                 <nav className="bottom-nav">
                     <button className={`nav-item ${view === 'landing' ? 'active' : ''}`} onClick={() => setView('landing')}>
                         <Home size={22} />

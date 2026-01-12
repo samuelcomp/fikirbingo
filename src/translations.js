@@ -24,6 +24,9 @@ export const translations = {
         history: "Transaction History",
         invite: "Invite Friends",
         langToggle: "Language / ቋንቋ",
+        registrationTitle: "Registration 📝",
+        registrationDesc: "To start playing, please share your contact number found in your Telegram account.",
+        shareContact: "Share Contact 📱",
     },
     am: {
         welcome: "እንኳን ደህና መጡ ወደ",
@@ -50,5 +53,8 @@ export const translations = {
         history: "የግብይት ታሪክ",
         invite: "ጓደኞችን ይጋብዙ",
         langToggle: "ቋንቋ / Language",
+        registrationTitle: "ምዝገባ 📝",
+        registrationDesc: "መጫወት ለመጀመር እባክዎን በቴሌግራም መለያዎ ውስጥ የሚገኘውን የመገናኛ ቁጥርዎን ያጋሩ።",
+        shareContact: "ስልክ ቁጥር ያጋሩ 📱",
     }
 };
