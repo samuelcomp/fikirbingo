@@ -10,7 +10,7 @@ import { Home, Trophy as TrophyIcon, Wallet, User as UserIcon, Gamepad2 } from '
 import { translations } from './translations';
 import './index.css';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').trim();
 
 function App() {
     const [view, setView] = useState('landing');
