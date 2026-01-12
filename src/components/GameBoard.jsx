@@ -3,8 +3,12 @@ import axios from 'axios';
 import { io } from 'socket.io-client';
 import { Trophy, Users, Star } from 'lucide-react';
 
-const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').trim();
-const socket = io(API_URL);
+const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\s/g, '');
+const socket = io(API_URL, {
+    extraHeaders: {
+        "ngrok-skip-browser-warning": "true"
+    }
+});
 
 const GameBoard = ({ user, roomId = 'room-10', selectedCartelas, onGameOver, t }) => {
     const [calledNumbers, setCalledNumbers] = useState([]);

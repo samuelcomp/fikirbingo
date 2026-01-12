@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
 
-const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').trim();
-const socket = io(API_URL);
+const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\s/g, '');
+const socket = io(API_URL, {
+    extraHeaders: {
+        "ngrok-skip-browser-warning": "true"
+    }
+});
 
 const CartelaSelection = ({ user, stake = 10, onGameStart, userBalance, t }) => {
     const [selectedCartelas, setSelectedCartelas] = useState([]);
