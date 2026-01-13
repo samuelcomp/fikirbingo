@@ -92,8 +92,10 @@ function App() {
     if (isLoading) {
         return (
             <div className="loading-screen">
-                <div className="spinner"></div>
-                <p>Loading Fikir Bingo...</p>
+                <div className="spinner-container">
+                    <div className="heart-loader"></div>
+                    <p className="loading-text">Loading Fikir Bingo (በመጫን ላይ)...</p>
+                </div>
             </div>
         );
     }

@@ -1,37 +1,42 @@
 import React, { useState } from 'react';
-import { Play, Trophy, Users, History, Wallet, HelpCircle, Heart } from 'lucide-react';
+import { Play, Trophy, Users, History, Wallet, HelpCircle } from 'lucide-react';
 
 const LandingPage = ({ onPlay, appName, appLogo, t, userBalance = 0 }) => {
     const [showRules, setShowRules] = useState(false);
 
-    // Premium Stats with Bilingual Labels
+    // Premium Stats with Bilingual Labels - kept simple to avoid overlap
     const stats = [
-        { labelEn: 'Active Players', labelAm: 'ንቁ ተጫዋቾች', value: '45K+', icon: <Users size={20} /> },
-        { labelEn: 'Games Played', labelAm: 'የተጫወቱ ጨዋታዎች', value: '60K+', icon: <History size={20} /> },
-        { labelEn: 'Winners Daily', labelAm: 'ዕለታዊ አሸናፊዎች', value: '500+', icon: <Trophy size={20} /> },
+        { label: t.activePlayers, value: '45K+', icon: <Users size={20} /> },
+        { label: t.gamesPlayed, value: '60K+', icon: <History size={20} /> },
+        { label: t.winnersDaily, value: '500+', icon: <Trophy size={20} /> },
     ];
 
-    // Premium Logo Path (New Generate Asset)
-    const premiumLogo = "C:\\Users\\MEGAUPLOAD\\.gemini\\antigravity\\brain\\f034a63b-897b-4788-894d-312ced5ea814\\fikir_bingo_premium_logo_1768303669555.png";
+    // Placeholder for logo if missing
+    const defaultLogo = "https://cdn-icons-png.flaticon.com/512/3408/3408545.png";
 
     return (
         <div className="landing-container">
             <header className="landing-header animate-reveal delay-1">
                 <div className="logo-section">
                     <div className="premium-logo-wrapper">
-                        <img src={premiumLogo} alt="Fikir Bingo" className="premium-logo-img" />
+                        <img
+                            src={appLogo || defaultLogo}
+                            alt="Fikir Bingo"
+                            className="premium-logo-img"
+                            onError={(e) => { e.target.src = defaultLogo; }}
+                        />
                     </div>
                 </div>
                 <button className="rules-btn prestige-btn" onClick={() => setShowRules(true)}>
                     <HelpCircle size={18} />
-                    <span>{t.rules} (Rules)</span>
+                    <span>{t.rules}</span>
                 </button>
             </header>
 
             <main className="landing-main">
                 <div className="welcome-section animate-reveal delay-2">
                     <h2 className="brilliant-text">
-                        <span>{t.welcome} (Welcome to)</span>
+                        <span>{t.welcome}</span>
                         Fikir Bingo
                     </h2>
                     <p className="welcome-sub">Real-time multiplayer bingo. Big stakes, big wins.</p>
@@ -61,7 +66,7 @@ const LandingPage = ({ onPlay, appName, appLogo, t, userBalance = 0 }) => {
 
                     <button className="play-btn prestige-action pulse" onClick={() => onPlay(10)}>
                         <Play size={22} fill="currentColor" />
-                        {t.playNow} (Play Now)
+                        {t.playNow}
                     </button>
                 </div>
 
@@ -70,10 +75,7 @@ const LandingPage = ({ onPlay, appName, appLogo, t, userBalance = 0 }) => {
                         <div key={i} className="stat-card premium-card glass-panel">
                             <div className="stat-icon-wrapper pulse-soft">{stat.icon}</div>
                             <span className="stat-value">{stat.value}</span>
-                            <div className="stat-bilingual-label">
-                                <span className="am">{stat.labelAm}</span>
-                                <span className="en">{stat.labelEn}</span>
-                            </div>
+                            <span className="stat-label">{stat.label}</span>
                         </div>
                     ))}
                 </div>
@@ -83,7 +85,7 @@ const LandingPage = ({ onPlay, appName, appLogo, t, userBalance = 0 }) => {
                 <div className="modal-overlay" onClick={() => setShowRules(false)}>
                     <div className="modal-content premium-card glass-modal" onClick={e => e.stopPropagation()}>
                         <div className="modal-header">
-                            <h3>{t.rules} (Game Rules) 📖</h3>
+                            <h3>{t.rules} 📖</h3>
                             <button className="close-modal" onClick={() => setShowRules(false)}>&times;</button>
                         </div>
                         <div className="rules-list">
