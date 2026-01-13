@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
-import { Trophy, LogOut, RotateCcw, Volume2, VolumeX, Star, Info, Target } from 'lucide-react';
+import { Trophy, LogOut, RotateCcw, Volume2, VolumeX, Info } from 'lucide-react';
 
 const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\s/g, '');
 const socket = io(API_URL, {
@@ -26,7 +25,8 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
     const isWatcher = selectedCartelas.length === 0;
 
     useEffect(() => {
-        const userId = user?.id || 'guest-' + Math.random().toString(36).substring(7);
+        if (!user?.id) return;
+        const userId = user.id;
         socket.emit('join_room', { roomId, userId });
 
         socket.on('room_state', (data) => {
@@ -42,6 +42,9 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                 if (data.calledNumbers?.length > 0) {
                     setCurrentBall(data.calledNumbers[data.calledNumbers.length - 1]);
                 }
+                if (data.winnerData) {
+                    setWinner(data.winnerData);
+                }
             }
         });
 
@@ -54,13 +57,18 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
         });
 
         socket.on('room_tick', (data) => {
-            setGameState(prev => ({
-                ...prev,
-                gameId: data.gameId,
-                status: data.status,
-                playersCount: data.playersCount,
-                prizePool: data.prizePool
-            }));
+            if (data.roomId === roomId) {
+                setGameState(prev => ({
+                    ...prev,
+                    gameId: data.gameId,
+                    status: data.status,
+                    playersCount: data.playersCount,
+                    prizePool: data.prizePool
+                }));
+                if (data.winnerData) {
+                    setWinner(data.winnerData);
+                }
+            }
         });
 
         socket.on('player_won', (data) => {
@@ -78,28 +86,7 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
             socket.off('player_won');
             socket.off('game_reset');
         };
-    }, [roomId]);
-
-    const renderCard = (card) => (
-        <div key={card.id} className="game-card-premium animate-reveal">
-            <div className="bingo-grid-5x5">
-                {['B', 'I', 'N', 'G', 'O'].map(col => (
-                    <div key={col} className="bingo-column">
-                        <div className="col-header">{col}</div>
-                        {card.numbers[col].map((num, i) => {
-                            const isMarked = gameState.calledNumbers.includes(num) || num === 'FREE';
-                            return (
-                                <div key={i} className={`mini-num ${isMarked ? 'marked' : ''}`}>
-                                    {num === 'FREE' ? '✨' : num}
-                                </div>
-                            );
-                        })}
-                    </div>
-                ))}
-            </div>
-            <div className="card-footer-no">Cartela No: {card.id}</div>
-        </div>
-    );
+    }, [roomId, user?.id, onGameOver]);
 
     const getBallColor = (num) => {
         if (num <= 15) return '#2563eb'; // B
@@ -117,131 +104,139 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
         return 'O';
     };
 
+    const renderCard = (card) => (
+        <div key={card.id} className="game-card-v3">
+            <div className="bingo-grid-5x5-v3">
+                {['B', 'I', 'N', 'G', 'O'].map((col, idx) => (
+                    <div key={col} className="bingo-col-v3">
+                        <div className="col-header-v3" style={{ backgroundColor: getBallColor(idx * 15 + 1) }}>{col}</div>
+                        {card.numbers[col].map((num, i) => {
+                            const isMarked = gameState.calledNumbers.includes(num) || num === 'FREE';
+                            return (
+                                <div key={i} className={`mini-num-v3 ${isMarked ? 'marked' : ''}`}>
+                                    {num === 'FREE' ? <span className="free-star">✨</span> : num}
+                                </div>
+                            );
+                        })}
+                    </div>
+                ))}
+            </div>
+            <div className="card-footer-v3">Cartela No: {card.id}</div>
+        </div>
+    );
+
     return (
-        <div className="premium-bg-container game-view">
+        <div className="game-view-v3 no-scroll-app">
             {/* 5-Pill Header */}
-            <header className="game-status-header">
-                <div className="status-pill-v3">
-                    <span className="pill-label">Game ID</span>
-                    <span className="pill-value mono">{gameState.gameId}</span>
+            <header className="game-status-row-v3">
+                <div className="stat-pill-v3">
+                    <span className="pill-title">Game ID</span>
+                    <span className="pill-val mono">{gameState.gameId}</span>
                 </div>
-                <div className="status-pill-v3">
-                    <span className="pill-label">Players</span>
-                    <span className="pill-value">{gameState.playersCount}</span>
+                <div className="stat-pill-v3">
+                    <span className="pill-title">Players</span>
+                    <span className="pill-val">{gameState.playersCount}</span>
                 </div>
-                <div className="status-pill-v3">
-                    <span className="pill-label">Bet</span>
-                    <span className="pill-value">{roomId.split('-')[1]}</span>
+                <div className="stat-pill-v3">
+                    <span className="pill-title">Bet</span>
+                    <span className="pill-val">{roomId.split('-')[1]}</span>
                 </div>
-                <div className="status-pill-v3 highlight">
-                    <span className="pill-label">Derash</span>
-                    <span className="pill-value">{gameState.prizePool}</span>
+                <div className="stat-pill-v3 derash-glow">
+                    <span className="pill-title">Derash</span>
+                    <span className="pill-val">{gameState.prizePool}</span>
                 </div>
-                <div className="status-pill-v3">
-                    <span className="pill-label">Called</span>
-                    <span className="pill-value">{gameState.calledNumbers.length}</span>
+                <div className="stat-pill-v3">
+                    <span className="pill-title">Called</span>
+                    <span className="pill-val">{gameState.calledNumbers.length}</span>
                 </div>
             </header>
 
-            <div className="game-main-layout">
-                {/* 1-75 Sidebar - ALWAYS VISIBLE */}
-                <aside className="numbers-sidebar">
-                    <div className="sidebar-grid">
-                        {['B', 'I', 'N', 'G', 'O'].map((letter, colIndex) => (
-                            <div key={letter} className="sidebar-col">
-                                <div className="sidebar-letter" style={{ backgroundColor: getBallColor(colIndex * 15 + 1) }}>{letter}</div>
-                                {Array.from({ length: 15 }, (_, i) => i + 1 + colIndex * 15).map(num => (
-                                    <div
-                                        key={num}
-                                        className={`sidebar-num ${gameState.calledNumbers.includes(num) ? 'called' : ''} ${currentBall === num ? 'active' : ''}`}
-                                        style={{ '--ball-color': getBallColor(num) }}
-                                    >
-                                        {num}
-                                    </div>
-                                ))}
-                            </div>
-                        ))}
-                    </div>
+            <div className="game-body-v3">
+                {/* 1-75 Vertical Sidebar (BINGO Columns) */}
+                <aside className="bingo-sidebar-v3">
+                    {['B', 'I', 'N', 'G', 'O'].map((letter, colIndex) => (
+                        <div key={letter} className="sidebar-col-v3">
+                            <div className="sidebar-letter-v3" style={{ backgroundColor: getBallColor(colIndex * 15 + 1) }}>{letter}</div>
+                            {Array.from({ length: 15 }, (_, i) => i + 1 + colIndex * 15).map(num => (
+                                <div
+                                    key={num}
+                                    className={`sidebar-num-v3 ${gameState.calledNumbers.includes(num) ? 'called' : ''} ${currentBall === num ? 'active' : ''}`}
+                                    style={{ '--accent': getBallColor(num) }}
+                                >
+                                    {num}
+                                </div>
+                            ))}
+                        </div>
+                    ))}
                 </aside>
 
-                {/* Main Content Area */}
-                <main className="game-board-main">
-                    <div className="game-top-row">
-                        <div className="recent-balls">
+                {/* Right Area: Control & Feedback */}
+                <main className="game-main-v3">
+                    <div className="top-feedback-v3">
+                        <div className="recent-draws-v3">
                             {gameState.calledNumbers.slice(-3).reverse().map((num, i) => (
-                                <div key={i} className="recent-ball" style={{ backgroundColor: getBallColor(num) }}>
+                                <div key={i} className="recent-ball-v3" style={{ backgroundColor: getBallColor(num) }}>
                                     {getBallLetter(num)}-{num}
                                 </div>
                             ))}
                         </div>
-                        <button className="sound-toggle" onClick={() => setIsVoiceEnabled(!isVoiceEnabled)}>
-                            {isVoiceEnabled ? <Volume2 size={24} /> : <VolumeX size={24} />}
+                        <button className="icon-btn-v3" onClick={() => setIsVoiceEnabled(!isVoiceEnabled)}>
+                            {isVoiceEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
                         </button>
                     </div>
 
-                    <div className="current-ball-focus">
+                    <div className="current-ball-v3">
                         {currentBall ? (
-                            <div className="big-ball shadow-pulse" style={{ borderColor: getBallColor(currentBall) }}>
-                                <span className="big-letter" style={{ color: getBallColor(currentBall) }}>{getBallLetter(currentBall)}</span>
-                                <span className="big-number">{currentBall}</span>
+                            <div className="focus-ball-v3 shadow-pulse" style={{ borderColor: getBallColor(currentBall) }}>
+                                <span className="focus-letter-v3" style={{ color: getBallColor(currentBall) }}>{getBallLetter(currentBall)}</span>
+                                <span className="focus-val-v3">{currentBall}</span>
                             </div>
                         ) : (
-                            <div className="big-ball waiting">
-                                <span className="waiting-text">READY</span>
+                            <div className="focus-ball-v3 waiting">
+                                <span className="wait-txt">WAITING</span>
                             </div>
                         )}
                     </div>
 
-                    <div className="mode-toggle-row">
-                        <span className="toggle-label">Automatic</span>
-                        <label className="switch">
+                    <div className="auto-toggle-row-v3">
+                        <span className="toggle-label-v3">Automatic</span>
+                        <label className="switch-v3">
                             <input type="checkbox" checked={isAutomatic} onChange={() => setIsAutomatic(!isAutomatic)} />
-                            <span className="slider round"></span>
+                            <span className="slider-v3 round"></span>
                         </label>
                     </div>
 
-                    <div className="cards-area">
+                    <div className="cards-stack-v3">
                         {isWatcher ? (
-                            <div className="watcher-mode animate-reveal">
-                                <div className="watcher-icon-container">
-                                    <div className="watcher-pulse-ring"></div>
-                                    <Info size={40} className="watcher-info-icon" />
-                                </div>
-                                <h2 className="watcher-title">Watching Only</h2>
-                                <p className="amharic-text watcher-p">የዚህ ዙር ጨዋታ ተጀምሯል። አዲስ ዙር እስኪጀምር እባክዎ ይጠብቁ።</p>
-                                <div className="watching-stats">
-                                    <div className="watch-pill">
-                                        <Target size={14} />
-                                        <span>Game In Progress</span>
-                                    </div>
-                                </div>
+                            <div className="watcher-empty-v3">
+                                <Info size={48} opacity={0.3} />
+                                <p>Watching Round</p>
+                                <small>የሚቀጥለውን ዙር ይጠብቁ</small>
                             </div>
                         ) : (
-                            <div className="active-cards">
-                                {selectedCartelas.map(renderCard)}
-                            </div>
+                            selectedCartelas.map(renderCard)
                         )}
                     </div>
                 </main>
             </div>
 
             {/* Bottom Actions */}
-            <footer className="game-footer-actions">
-                <button className="foot-btn leave" onClick={() => onGameOver()}>
-                    <LogOut size={20} /> Leave
+            <footer className="game-footer-v3">
+                <button className="action-btn-v3 leave" onClick={() => onGameOver()}>
+                    Leave
                 </button>
-                <button className="foot-btn refresh" onClick={() => window.location.reload()}>
-                    <RotateCcw size={18} /> Refresh
+                <button className="action-btn-v3 refresh" onClick={() => window.location.reload()}>
+                    Refresh
                 </button>
                 <button
-                    className={`foot-btn automatic-action ${isWatcher ? 'disabled' : ''}`}
+                    className={`action-btn-v3 automatic ${isAutomatic ? 'active' : 'claim'}`}
                     disabled={isWatcher}
                 >
                     {isAutomatic ? 'Automatic' : 'CLAIM BINGO!'}
                 </button>
             </footer>
 
-            {/* Winner Modal */}
+            {/* Winner Overlay */}
             {winner && (
                 <div className="bingo-modal-overlay">
                     <div className="bingo-modal-content upscale-reveal gold-border">
