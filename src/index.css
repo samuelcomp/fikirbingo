@@ -235,7 +235,8 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
+  /* Extremely tight for Mini App feel */
 }
 
 .logo-section {
@@ -284,7 +285,8 @@ body {
 
 .welcome-section {
   text-align: left;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
+  /* Reduced to fit better with header */
 }
 
 .welcome-section h2 {
@@ -1122,16 +1124,19 @@ body {
 .premium-logo-wrapper {
   perspective: 1000px;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 0;
+  /* No margin below logo wrapper in compact mode */
 }
 
 .premium-logo-img {
-  width: 80px;
-  height: 80px;
+  width: 75px;
+  height: 75px;
   object-fit: contain;
-  filter: drop-shadow(0 0 25px var(--primary-glow));
+  filter: drop-shadow(0 0 15px var(--primary-glow));
+  mix-blend-mode: screen;
+  /* ACHIEVES TRANSPARENCY for black background logos */
   animation: logo-float 4s ease-in-out infinite;
 }
 

@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const logoPath = 'C:\\Users\\MEGAUPLOAD\\.gemini\\antigravity\\brain\\f034a63b-897b-4788-894d-312ced5ea814\\fikir_bingo_premium_logo_1768303669555.png';
+const logoPath = 'C:\\Users\\MEGAUPLOAD\\.gemini\\antigravity\\brain\\f034a63b-897b-4788-894d-312ced5ea814\\fikir_bingo_logo_v2_black_bg_1768308875214.png';
 const outputPath = path.join(__dirname, 'src', 'assets', 'logo.js');
 
 if (!fs.existsSync(path.join(__dirname, 'src', 'assets'))) {
