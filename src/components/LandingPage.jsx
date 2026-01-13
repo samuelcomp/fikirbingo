@@ -1,18 +1,17 @@
 import React, { useState } from 'react';
-import { Play, Trophy, Users, History, Wallet, HelpCircle } from 'lucide-react';
+import { Play, Trophy, Users, History, Wallet, HelpCircle, CheckCircle2 } from 'lucide-react';
 import { logoBase64 } from '../assets/logo';
 
 const LandingPage = ({ onPlay, appName, appLogo, t, userBalance = 0 }) => {
     const [showRules, setShowRules] = useState(false);
+    const [selectedStake, setSelectedStake] = useState(10);
 
-    // Premium Stats with Bilingual Labels - kept simple to avoid overlap
     const stats = [
         { label: t.activePlayers, value: '45K+', icon: <Users size={20} /> },
         { label: t.gamesPlayed, value: '60K+', icon: <History size={20} /> },
         { label: t.winnersDaily, value: '500+', icon: <Trophy size={20} /> },
     ];
 
-    // Authentic premium logo
     const authenticLogo = logoBase64;
 
     return (
@@ -56,22 +55,28 @@ const LandingPage = ({ onPlay, appName, appLogo, t, userBalance = 0 }) => {
                             {[10, 50, 100].map((val, idx) => (
                                 <button
                                     key={val}
-                                    className={`stake-btn-premium chip-style delay-${idx + 1}`}
-                                    onClick={() => onPlay(val)}
+                                    className={`stake-btn-premium chip-style ${selectedStake === val ? 'selected' : ''}`}
+                                    onClick={() => setSelectedStake(val)}
                                 >
+                                    <div className="selection-dot">
+                                        {selectedStake === val && <CheckCircle2 size={12} />}
+                                    </div>
                                     <span className="stake-val">{val}</span>
-                                    <span className="stake-unit">Birr (ብር)</span>
+                                    <span className="stake-unit">Birr</span>
                                 </button>
                             ))}
                         </div>
 
-                        <button className="play-btn prestige-action pulse" onClick={() => onPlay(10)}>
+                        <button
+                            className="play-btn prestige-action pulse active-play"
+                            onClick={() => onPlay(selectedStake)}
+                        >
                             <Play size={22} fill="currentColor" />
-                            {t.playNow}
+                            {t.playNow} - {selectedStake} Birr
                         </button>
                     </div>
 
-                    <div className="stats-grid animate-reveal delay-3">
+                    <div className="stats-grid animate-reveal delay-4">
                         {stats.map((stat, i) => (
                             <div key={i} className="stat-card premium-card glass-panel">
                                 <div className="stat-icon-wrapper pulse-soft">{stat.icon}</div>
@@ -91,11 +96,11 @@ const LandingPage = ({ onPlay, appName, appLogo, t, userBalance = 0 }) => {
                             </div>
                             <div className="rules-list">
                                 {[
-                                    { en: "Choose 1 or 2 cartelas (cards) with your preferred stake (10 - 100 Birr).", am: "በመረጡት መጠን (ከ10 - 100 ብር) 1 ወይም 2 ካርቴላዎችን ይምረጡ።" },
-                                    { en: "Wait for the live round to start. Numbers are called every 5 seconds.", am: "ጨዋታው እስኪጀምር ይጠብቁ። ቁጥሮች በየ 5 ሰከንዱ ይጠራሉ።" },
-                                    { en: "System automatically marks called numbers on your cards in real-time.", am: "ሲስተሙ የተጠሩትን ቁጥሮች በራሱ ምልክት ያደርጋል።" },
-                                    { en: "First player to complete a full line wins the entire prize pool!", am: "አንድ መስመር ቀድሞ የጨረሰ ተጫዋች አጠቃላይ ሽልማቱን ያሸንፋል!" },
-                                    { en: "House takes a 15% commission. Payouts are instant.", am: "ሲስተሙ 15% ኮሚሽን ይወስዳል። ክፍያ ወዲያውኑ ይፈጸማል።" }
+                                    { en: "Select your stake and click PLAY to enter the lobby.", am: "መጠንዎን ይምረጡ እና ወደ ሎቢው ለመግባት PLAY የሚለውን ይጫኑ።" },
+                                    { en: "Choose 1 or 2 cartelas (cards) to play with.", am: "ለመጫወት 1 ወይም 2 ካርቴላዎችን ይምረጡ።" },
+                                    { en: "Wait for the round. The system automatically detects and announces winners!", am: "ዙሩን ይጠብቁ። ሲስተሙ አሸናፊዎችን በራሱ ያሳውቃል!" },
+                                    { en: "First player to complete a full line wins the prize pool!", am: "ቀድሞ መስመር የጨረሰ ተጫዋች ሽልማቱን ያሸንፋል!" },
+                                    { en: "House adds a small commission. Payouts are instant.", am: "ሲስተሙ አነስተኛ ኮሚሽን ይወስዳል። ክፍያ ወዲያውኑ ይፈጸማል።" }
                                 ].map((rule, i) => (
                                     <div key={i} className="rule-item-premium">
                                         <div className="rule-step-badge">{i + 1}</div>

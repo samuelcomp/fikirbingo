@@ -1,55 +1,71 @@
 import React from 'react';
-import { User, Trophy, Share2, Settings, LogOut, Globe, Star } from 'lucide-react';
+import { User, Trophy, Share2, Settings, LogOut, Globe, Star, ChevronRight } from 'lucide-react';
 
 const ProfilePage = ({ user, lang, onToggleLang, onLogout, t }) => {
     return (
-        <div className="profile-container">
-            <div className="profile-header">
-                <div className="profile-avatar">
-                    <User size={40} />
-                </div>
-                <h2>{user?.username || 'Player'}</h2>
-                <span className="user-id">ID: {user?.id?.slice(0, 8)}</span>
-            </div>
-
-            <div className="profile-stats-grid">
-                <div className="p-stat-box premium-card">
-                    <Trophy className="stat-icon-wrapper" style={{ color: 'var(--accent)' }} />
-                    <span className="val">{user?.totalWins || 0}</span>
-                    <span className="lab">{lang === 'am' ? 'አሸናፊ' : 'Wins'}</span>
-                </div>
-                <div className="p-stat-box premium-card">
-                    <Star className="stat-icon-wrapper" style={{ color: 'var(--secondary)' }} />
-                    <span className="val">{user?.coins || 0}</span>
-                    <span className="lab">{lang === 'am' ? 'ኮይኖች' : 'Coins'}</span>
-                </div>
-            </div>
-
-            <div className="profile-menu">
-                <div className="menu-item" onClick={onToggleLang}>
-                    <Globe size={20} className="stat-icon-wrapper" />
-                    <div className="menu-text">
-                        <span style={{ fontWeight: 700 }}>{t.langToggle}</span>
-                        <small style={{ color: 'var(--text-dim)' }}>{lang === 'en' ? 'English' : 'አማርኛ'}</small>
-                    </div>
-                    <div className={`toggle ${lang === 'am' ? 'on' : ''}`}></div>
-                </div>
-                <div className="menu-item">
-                    <Settings size={20} className="stat-icon-wrapper" />
-                    <div className="menu-text">
-                        <span style={{ fontWeight: 700 }}>Settings</span>
+        <div className="profile-wrapper animate-reveal">
+            <div className="profile-hero">
+                <div className="avatar-ring">
+                    <div className="avatar-inner">
+                        <User size={48} color="white" />
                     </div>
                 </div>
-                <div className="menu-item logout" onClick={onLogout} style={{ marginTop: '20px', borderColor: 'var(--primary-glow)' }}>
-                    <LogOut size={20} color="var(--primary)" />
-                    <span style={{ fontWeight: 800, color: 'var(--primary)' }}>{lang === 'am' ? 'ውጣ' : 'Logout'}</span>
+                <h2 className="profile-name">{user?.username || 'DevPlayer'}</h2>
+                <span className="profile-id">ID: {user?.id?.substring(0, 10)}</span>
+            </div>
+
+            <div className="profile-stats-row">
+                <div className="p-stat-card gold-glow">
+                    <Trophy className="stat-icon-v2" />
+                    <div className="stat-text-v2">
+                        <span className="v2-val">{user?.totalWins || 12}</span>
+                        <span className="v2-lab">WINS</span>
+                    </div>
+                </div>
+                <div className="p-stat-card cyan-glow">
+                    <Star className="stat-icon-v2" />
+                    <div className="stat-text-v2">
+                        <span className="v2-val">{user?.coins || 450}</span>
+                        <span className="v2-lab">COINS</span>
+                    </div>
                 </div>
             </div>
 
-            <div className="referral-banner premium-card" style={{ marginTop: 'auto' }}>
-                <h3 style={{ marginBottom: '8px' }}>{t.invite}</h3>
-                <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '16px' }}>Earn 2% of their deposits forever!</p>
-                <button className="play-btn">Copy Invite Link</button>
+            <div className="profile-menu-v2">
+                <div className="menu-row-v2" onClick={onToggleLang}>
+                    <div className="menu-icon-bg"><Globe size={20} /></div>
+                    <div className="menu-info-v2">
+                        <span className="menu-title-v2">Language / ቋንቋ</span>
+                        <span className="menu-sub-v2">{lang === 'en' ? 'English' : 'አማርኛ'}</span>
+                    </div>
+                    <label className="switch mini">
+                        <input type="checkbox" checked={lang === 'am'} readOnly />
+                        <span className="slider round"></span>
+                    </label>
+                </div>
+
+                <div className="menu-row-v2">
+                    <div className="menu-icon-bg"><Settings size={20} /></div>
+                    <div className="menu-info-v2">
+                        <span className="menu-title-v2">Settings</span>
+                    </div>
+                    <ChevronRight size={20} opacity={0.3} />
+                </div>
+
+                <div className="menu-row-v2 logout-v2" onClick={onLogout}>
+                    <div className="menu-icon-bg log-bg"><LogOut size={20} color="#ff4444" /></div>
+                    <div className="menu-info-v2">
+                        <span className="menu-title-v2" style={{ color: '#ff4444' }}>Logout</span>
+                    </div>
+                </div>
+            </div>
+
+            <div className="invite-banner-v2">
+                <h3>Invite Friends</h3>
+                <p>Earn 2% of their deposits forever!</p>
+                <button className="copy-link-btn">
+                    Copy Invite Link
+                </button>
             </div>
         </div>
     );

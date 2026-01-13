@@ -61,7 +61,20 @@ function App() {
                 });
                 setUser(res.data);
             } else {
-                setUser({ id: 'dev-user', username: 'DevPlayer', playBalance: 1250, mainBalance: 50, totalWins: 12, coins: 450 });
+                let devId = sessionStorage.getItem('devOrderId');
+                if (!devId) {
+                    devId = 'dev-' + Math.random().toString(36).substring(7);
+                    sessionStorage.setItem('devOrderId', devId);
+                }
+                setUser({
+                    id: devId,
+                    username: 'Player-' + devId.substring(4).toUpperCase(),
+                    phoneNumber: '0900000000',
+                    playBalance: 1250,
+                    mainBalance: 50,
+                    totalWins: 12,
+                    coins: 450
+                });
             }
         } catch (e) {
             console.error('Profile fetch failed');

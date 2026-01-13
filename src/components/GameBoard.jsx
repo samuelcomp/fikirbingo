@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { io } from 'socket.io-client';
-import { Trophy, LogOut, RotateCcw, Volume2, VolumeX, Star, Info } from 'lucide-react';
+import { Trophy, LogOut, RotateCcw, Volume2, VolumeX, Star, Info, Target } from 'lucide-react';
 
 const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\s/g, '');
 const socket = io(API_URL, {
@@ -80,52 +80,6 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
         };
     }, [roomId]);
 
-    // Automated Win Claiming
-    useEffect(() => {
-        if (isAutomatic && !isWatcher && gameState.status === 'PLAYING') {
-            selectedCartelas.forEach(card => {
-                if (checkWinLocal(card, gameState.calledNumbers)) {
-                    socket.emit('claim_win', { roomId, userId: user?.id, cartelaId: card.id });
-                }
-            });
-        }
-    }, [gameState.calledNumbers, isAutomatic, isWatcher, selectedCartelas, gameState.status]);
-
-    const checkWinLocal = (card, called) => {
-        const calledSet = new Set(called);
-        calledSet.add('FREE');
-
-        const grid = [card.numbers.B, card.numbers.I, card.numbers.N, card.numbers.G, card.numbers.O];
-
-        // Columns
-        for (let c = 0; c < 5; c++) {
-            if (grid[c].every(num => calledSet.has(num))) return true;
-        }
-        // Rows
-        for (let r = 0; r < 5; r++) {
-            let win = true;
-            for (let c = 0; c < 5; c++) {
-                if (!calledSet.has(grid[c][r])) { win = false; break; }
-            }
-            if (win) return true;
-        }
-        // Diagonals
-        let d1 = true, d2 = true;
-        for (let i = 0; i < 5; i++) {
-            if (!calledSet.has(grid[i][i])) d1 = false;
-            if (!calledSet.has(grid[i][4 - i])) d2 = false;
-        }
-        return d1 || d2;
-    };
-
-    const claimBingo = () => {
-        if (!isWatcher) {
-            selectedCartelas.forEach(c => {
-                socket.emit('claim_win', { roomId, userId: user?.id, cartelaId: c.id });
-            });
-        }
-    };
-
     const renderCard = (card) => (
         <div key={card.id} className="game-card-premium animate-reveal">
             <div className="bingo-grid-5x5">
@@ -190,12 +144,12 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
             </header>
 
             <div className="game-main-layout">
-                {/* 1-75 Sidebar */}
+                {/* 1-75 Sidebar - ALWAYS VISIBLE */}
                 <aside className="numbers-sidebar">
                     <div className="sidebar-grid">
                         {['B', 'I', 'N', 'G', 'O'].map((letter, colIndex) => (
                             <div key={letter} className="sidebar-col">
-                                <div className="sidebar-letter">{letter}</div>
+                                <div className="sidebar-letter" style={{ backgroundColor: getBallColor(colIndex * 15 + 1) }}>{letter}</div>
                                 {Array.from({ length: 15 }, (_, i) => i + 1 + colIndex * 15).map(num => (
                                     <div
                                         key={num}
@@ -249,9 +203,18 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                     <div className="cards-area">
                         {isWatcher ? (
                             <div className="watcher-mode animate-reveal">
-                                <div className="watcher-icon"><Info size={48} /></div>
-                                <h2>Watching Only</h2>
-                                <p className="amharic-text">የዚህ ዙር ጨዋታ ተጀምሯል። አዲስ ዙር እስኪጀምር እባክዎ ይጠብቁ።</p>
+                                <div className="watcher-icon-container">
+                                    <div className="watcher-pulse-ring"></div>
+                                    <Info size={40} className="watcher-info-icon" />
+                                </div>
+                                <h2 className="watcher-title">Watching Only</h2>
+                                <p className="amharic-text watcher-p">የዚህ ዙር ጨዋታ ተጀምሯል። አዲስ ዙር እስኪጀምር እባክዎ ይጠብቁ።</p>
+                                <div className="watching-stats">
+                                    <div className="watch-pill">
+                                        <Target size={14} />
+                                        <span>Game In Progress</span>
+                                    </div>
+                                </div>
                             </div>
                         ) : (
                             <div className="active-cards">
@@ -272,7 +235,7 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                 </button>
                 <button
                     className={`foot-btn automatic-action ${isWatcher ? 'disabled' : ''}`}
-                    onClick={claimBingo}
+                    disabled={isWatcher}
                 >
                     {isAutomatic ? 'Automatic' : 'CLAIM BINGO!'}
                 </button>
@@ -297,7 +260,7 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                             <div className="bingo-grid-5x5 mini">
                                 {['B', 'I', 'N', 'G', 'O'].map(col => (
                                     <div key={col} className="bingo-column">
-                                        <div className="col-header">{col}</div>
+                                        <div className="col-header" style={{ color: getBallColor(['B', 'I', 'N', 'G', 'O'].indexOf(col) * 15 + 1) }}>{col}</div>
                                         {winner.officialCard?.numbers[col].map((num, i) => {
                                             const isMarked = gameState.calledNumbers.includes(num) || num === 'FREE';
                                             return (
@@ -311,10 +274,18 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                             </div>
                         </div>
 
+                        <div className="prize-sum">
+                            <span className="prize-val">{winner.prize} <small>Birr</small></span>
+                        </div>
+
                         <div className="next-game-ticker">
                             <div className="ticker-dot"></div>
                             Auto-starting next game in 10s
                         </div>
+
+                        <button className="continue-btn" onClick={() => onGameOver()}>
+                            CONTINUE
+                        </button>
                     </div>
                 </div>
             )}
