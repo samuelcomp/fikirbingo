@@ -18,14 +18,14 @@ const ProfilePage = ({ user, lang, onToggleLang, onLogout, t }) => {
                 <div className="p-stat-card gold-glow">
                     <Trophy className="stat-icon-v2" />
                     <div className="stat-text-v2">
-                        <span className="v2-val">{user?.totalWins || 12}</span>
+                        <span className="v2-val">{user?.totalWins || 0}</span>
                         <span className="v2-lab">WINS</span>
                     </div>
                 </div>
                 <div className="p-stat-card cyan-glow">
                     <Star className="stat-icon-v2" />
                     <div className="stat-text-v2">
-                        <span className="v2-val">{user?.coins || 450}</span>
+                        <span className="v2-val">{user?.coins || 0}</span>
                         <span className="v2-lab">COINS</span>
                     </div>
                 </div>

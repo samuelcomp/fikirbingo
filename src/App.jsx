@@ -37,12 +37,17 @@ function App() {
             setBranding(brandRes.data);
 
             const initData = window.Telegram?.WebApp?.initData;
+            const token = localStorage.getItem('userToken');
+
             if (initData) {
                 const authRes = await axios.post(`${API_URL}/api/auth`, { initData });
                 localStorage.setItem('userToken', authRes.data.token);
                 setUser(authRes.data.user);
                 setMustRegister(authRes.data.mustRegister);
+            } else if (token) {
+                fetchUserProfile();
             } else {
+                // Initial dev/guest user
                 fetchUserProfile();
             }
         } catch (e) {
@@ -60,7 +65,8 @@ function App() {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 setUser(res.data);
-            } else {
+            } else if (!window.Telegram?.WebApp?.initData) {
+                // Only use dev fallback if definitely NOT in Telegram
                 let devId = sessionStorage.getItem('devOrderId');
                 if (!devId) {
                     devId = 'dev-' + Math.random().toString(36).substring(7);
@@ -72,8 +78,8 @@ function App() {
                     phoneNumber: '0900000000',
                     playBalance: 1250,
                     mainBalance: 50,
-                    totalWins: 12,
-                    coins: 450
+                    totalWins: 0,
+                    coins: 0
                 });
             }
         } catch (e) {
