@@ -1,5 +1,5 @@
 import React from 'react';
-import { User, Trophy, Share2, Settings, LogOut, Globe, Star, ChevronRight } from 'lucide-react';
+import { User, Trophy, Share2, Settings, LogOut, Globe, Star, ChevronRight, Gamepad2 } from 'lucide-react';
 
 const ProfilePage = ({ user, lang, onToggleLang, onLogout, t }) => {
     return (
@@ -11,7 +11,10 @@ const ProfilePage = ({ user, lang, onToggleLang, onLogout, t }) => {
                     </div>
                 </div>
                 <h2 className="profile-name">{user?.username || 'DevPlayer'}</h2>
-                <span className="profile-id">ID: {user?.id?.substring(0, 10)}</span>
+                <div className="profile-meta">
+                    <span className="profile-id">ID: {user?.id?.substring(0, 10)}</span>
+                    <span className="profile-phone">{user?.phoneNumber || 'No Phone'}</span>
+                </div>
             </div>
 
             <div className="profile-stats-row">
@@ -20,6 +23,13 @@ const ProfilePage = ({ user, lang, onToggleLang, onLogout, t }) => {
                     <div className="stat-text-v2">
                         <span className="v2-val">{user?.totalWins || 0}</span>
                         <span className="v2-lab">WINS</span>
+                    </div>
+                </div>
+                <div className="p-stat-card blue-glow">
+                    <Gamepad2 className="stat-icon-v2" />
+                    <div className="stat-text-v2">
+                        <span className="v2-val">{user?.totalGames || 0}</span>
+                        <span className="v2-lab">PLAYS</span>
                     </div>
                 </div>
                 <div className="p-stat-card cyan-glow">

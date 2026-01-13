@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
-import { ChevronLeft, RotateCcw, Hash } from 'lucide-react';
+import { ChevronLeft, RotateCcw, Hash, Users, Trophy } from 'lucide-react';
 
 const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\s/g, '');
 const socket = io(API_URL, {
@@ -14,6 +14,8 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
     const [takenCartelas, setTakenCartelas] = useState({}); // { userId: [ids] }
     const [countdown, setCountdown] = useState(60);
     const [roomStatus, setRoomStatus] = useState('WAITING');
+    const [playersCount, setPlayersCount] = useState(0);
+    const [prizePool, setPrizePool] = useState(0);
     const roomId = `room-${stake}`;
 
     useEffect(() => {
@@ -25,6 +27,8 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
                 setCountdown(data.countdown);
                 setRoomStatus(data.status);
                 setTakenCartelas(data.takenCartelas || {});
+                setPlayersCount(data.playersCount || 0);
+                setPrizePool(data.prizePool || 0);
 
                 // Sync our selection with server
                 const myTaken = data.takenCartelas?.[userId] || [];
@@ -33,17 +37,16 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
         });
 
         socket.on('room_tick', (data) => {
-            setCountdown(data.countdown);
-            setRoomStatus(data.status);
+            if (data.roomId === roomId) {
+                setCountdown(data.countdown);
+                setRoomStatus(data.status);
+                setPlayersCount(data.playersCount || 0);
+                setPrizePool(data.prizePool || 0);
+            }
         });
 
         socket.on('game_started', () => {
-            const currentSelected = selectedIds.map(id => generateDeterministicCard(id));
-            if (currentSelected.length > 0) {
-                onGameStart(currentSelected);
-            } else {
-                onGameStart([]);
-            }
+            // This event is handled when the component is active
         });
 
         return () => {
@@ -51,7 +54,20 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
             socket.off('room_tick');
             socket.off('game_started');
         };
-    }, [roomId, selectedIds, onGameStart, user?.id]);
+    }, [roomId, stake, user?.id]);
+
+    useEffect(() => {
+        const handleStart = () => {
+            const currentSelected = selectedIds.map(id => generateDeterministicCard(id));
+            if (currentSelected.length > 0) {
+                onGameStart(currentSelected);
+            } else {
+                onGameStart([]);
+            }
+        };
+        socket.on('game_started', handleStart);
+        return () => socket.off('game_started', handleStart);
+    }, [selectedIds, onGameStart]);
 
     const generateDeterministicCard = (id) => {
         const getNumbers = (cardId, offset, min, max, count) => {
@@ -125,72 +141,89 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
     };
 
     return (
-        <div className="premium-bg-container">
-            <header className="lobby-top-nav">
-                <button className="nav-btn" onClick={() => window.history.back()}>
-                    <ChevronLeft size={20} /> Back
-                </button>
-                <div className="lobby-title">Bingo Lobby</div>
-                <button className="nav-btn" onClick={() => window.location.reload()}>
-                    <RotateCcw size={18} /> Refresh
-                </button>
+        <div className="premium-bg-container no-scroll-app">
+            <header className="lobby-header-v2">
+                <div className="lobby-top-bar">
+                    <button className="back-btn-v2" onClick={() => window.history.back()}>
+                        <ChevronLeft size={24} />
+                    </button>
+                    <div className="lobby-branding">
+                        <h1 className="lobby-title-v2">BINGO LOBBY</h1>
+                        <span className="lobby-subtitle-v2">STAKE: {stake} BIRR</span>
+                    </div>
+                    <button className="refresh-btn-v2" onClick={() => window.location.reload()}>
+                        <RotateCcw size={20} />
+                    </button>
+                </div>
+
+                <div className="lobby-stats-v2">
+                    <div className="l-stat-box prize-glow">
+                        <Trophy size={18} className="l-stat-icon" />
+                        <div className="l-stat-info">
+                            <span className="l-stat-label">PRIZE POOL</span>
+                            <span className="l-stat-value">{prizePool} <small>Birr</small></span>
+                        </div>
+                    </div>
+                    <div className="l-stat-box players-glow">
+                        <Users size={18} className="l-stat-icon" />
+                        <div className="l-stat-info">
+                            <span className="l-stat-label">PLAYERS</span>
+                            <span className="l-stat-value">{playersCount}</span>
+                        </div>
+                    </div>
+                    <div className="l-stat-box timer-glow">
+                        <div className="l-timer-circle">
+                            <span className="l-timer-val">{countdown}</span>
+                            <span className="l-timer-unit">SEC</span>
+                        </div>
+                        <div className="l-stat-info">
+                            <span className="l-stat-label">STARTS IN</span>
+                            <span className="l-stat-status">{roomStatus}</span>
+                        </div>
+                    </div>
+                </div>
             </header>
 
-            <div className="status-pills-row">
-                <div className="status-pill">
-                    <span className="pill-label">Main Wallet</span>
-                    <span className="pill-value">{user?.mainBalance || 0}</span>
-                </div>
-                <div className="status-pill highlight">
-                    <span className="pill-label">Play Wallet</span>
-                    <span className="pill-value">{user?.playBalance || 0}</span>
-                </div>
-                <div className="status-pill">
-                    <span className="pill-label">Stake</span>
-                    <span className="pill-value">{stake}</span>
-                </div>
-                <div className="status-pill timer">
-                    <span className="pill-value">{countdown}<small>s</small></span>
-                </div>
-            </div>
-
-            <div className="cartela-scroll-area">
-                <div className="cartela-grid-v2">
+            <div className="lobby-content-area">
+                <div className="cartela-grid-professional scroll-v">
                     {Array.from({ length: 400 }, (_, i) => i + 1).map(id => {
                         const isMine = selectedIds.includes(id);
                         const isOther = isTakenByOther(id);
                         return (
                             <div
                                 key={id}
-                                className={`grid-item ${isMine ? 'mine' : ''} ${isOther ? 'other' : ''}`}
+                                className={`cartela-chip ${isMine ? 'is-mine' : ''} ${isOther ? 'is-taken' : ''}`}
                                 onClick={() => toggleCartela(id)}
                             >
-                                {id}
+                                <span className="chip-id">{id}</span>
+                                {isMine && <div className="chip-indicator"></div>}
                             </div>
                         );
                     })}
                 </div>
             </div>
 
-            <div className="selection-preview-container">
-                {selectedIds.length === 0 ? (
-                    <div className="empty-preview">
-                        <Hash size={32} />
-                        <p>Select up to 2 cards to preview</p>
-                    </div>
-                ) : (
-                    <div className="previews-row">
-                        {selectedIds.map(id => renderPreview(id))}
-                    </div>
-                )}
-            </div>
-
-            <footer className="lobby-v2-footer">
+            <footer className="lobby-footer-v2">
+                <div className="selection-tray">
+                    {selectedIds.length === 0 ? (
+                        <div className="tray-empty">Pick up to 2 cards to play</div>
+                    ) : (
+                        <div className="tray-cards">
+                            {selectedIds.map(id => (
+                                <div key={id} className="tray-card">Card #{id}</div>
+                            ))}
+                        </div>
+                    )}
+                </div>
                 <button
-                    className={`confirm-play-btn ${selectedIds.length > 0 ? 'active' : ''}`}
+                    className={`lobby-play-btn ${selectedIds.length > 0 ? 'btn-active' : 'btn-dim'}`}
                     disabled={selectedIds.length === 0 || roomStatus !== 'WAITING'}
                 >
-                    {roomStatus === 'PLAYING' ? 'GAME IN PROGRESS' : `PLAY WITH ${selectedIds.length * stake} BIRR`}
+                    {roomStatus === 'PLAYING' ? (
+                        'JOINING NEXT ROUND...'
+                    ) : (
+                        <>PLAY WITH {selectedIds.length * stake} BIRR</>
+                    )}
                 </button>
             </footer>
         </div>

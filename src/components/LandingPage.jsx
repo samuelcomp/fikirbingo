@@ -33,7 +33,7 @@ const LandingPage = ({ onPlay, appName, appLogo, t, userBalance = 0 }) => {
                     </button>
                 </header>
 
-                <main className="landing-main">
+                <main className="landing-main no-scroll-main">
                     <div className="welcome-section animate-reveal delay-2">
                         <h2 className="brilliant-text">
                             <span>{t.welcome}</span>
@@ -74,16 +74,6 @@ const LandingPage = ({ onPlay, appName, appLogo, t, userBalance = 0 }) => {
                             <Play size={22} fill="currentColor" />
                             {t.playNow} - {selectedStake} Birr
                         </button>
-                    </div>
-
-                    <div className="stats-grid animate-reveal delay-4">
-                        {stats.map((stat, i) => (
-                            <div key={i} className="stat-card premium-card glass-panel">
-                                <div className="stat-icon-wrapper pulse-soft">{stat.icon}</div>
-                                <span className="stat-value">{stat.value}</span>
-                                <span className="stat-label">{stat.label}</span>
-                            </div>
-                        ))}
                     </div>
                 </main>
 

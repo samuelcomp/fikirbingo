@@ -2606,3 +2606,290 @@ input:checked+.slider:before {
   transform: scale(0.98);
 }
 
+
+
+/* Profile Meta & Extra Stats */
+.profile-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.profile-phone {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.profile-stats-row {
+  grid-template-columns: repeat(3, 1fr) !important;
+}
+
+.p-stat-card {
+  padding: 12px 8px !important;
+}
+
+.blue-glow .stat-icon-v2 { color: #3b82f6; }
+
+/* Enhanced Winner Announcement */
+.winner-name {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.bingo-modal-content {
+  background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
+  border: 2px solid rgba(251, 191, 36, 0.3);
+}
+
+.ticker-dot {
+  width: 8px;
+  height: 8px;
+  background: #fbbf24;
+  border-radius: 50%;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+
+
+/* Winner Modal V2 */
+.gold-border {
+  border: 3px solid #fbbf24 !important;
+  box-shadow: 0 0 40px rgba(251, 191, 36, 0.4) !important;
+}
+
+.glow-text {
+  text-shadow: 0 0 15px rgba(251, 191, 36, 0.6);
+  color: #fbbf24 !important;
+}
+
+.winner-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.winner-phone {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 500;
+}
+
+.prize-sum-v2 {
+  margin: 15px 0;
+  text-align: center;
+}
+
+.prize-label {
+  font-size: 12px;
+  color: rgba(251, 191, 36, 0.6);
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+.prize-val-v2 {
+  font-size: 56px;
+  font-weight: 900;
+  color: #fbbf24;
+  line-height: 1;
+}
+
+.prize-val-v2 small {
+  font-size: 20px;
+  opacity: 0.8;
+}
+
+
+
+/* V3 UI/UX: Premium Lobby & Landing Refinements */
+.no-scroll-app {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.no-scroll-main {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Lobby Header V2 */
+.lobby-header-v2 {
+  padding: 16px;
+  background: linear-gradient(180deg, rgba(31, 41, 55, 0.9) 0%, rgba(17, 24, 39, 0.95) 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.lobby-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.lobby-branding { text-align: center; }
+.lobby-title-v2 { font-size: 18px; font-weight: 900; letter-spacing: 2px; color: #fff; margin: 0; }
+.lobby-subtitle-v2 { font-size: 11px; color: #fbbf24; font-weight: 700; opacity: 0.8; }
+
+.lobby-stats-v2 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.l-stat-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.prize-glow { border-color: rgba(251, 191, 36, 0.3); }
+.players-glow { border-color: rgba(59, 130, 246, 0.3); }
+.timer-glow { border-color: rgba(239, 68, 68, 0.3); padding: 5px 10px; }
+
+.l-stat-icon { color: rgba(255,255,255,0.4); }
+.prize-glow .l-stat-icon { color: #fbbf24; }
+.players-glow .l-stat-icon { color: #3b82f6; }
+
+.l-stat-label { font-size: 8px; color: rgba(255,255,255,0.5); font-weight: 800; display: block; }
+.l-stat-value { font-size: 16px; font-weight: 900; color: #fff; }
+.l-stat-value small { font-size: 10px; opacity: 0.6; }
+
+.l-timer-circle {
+  width: 36px;
+  height: 36px;
+  border: 2px solid #ef4444;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.l-timer-val { font-size: 14px; font-weight: 900; color: #ef4444; line-height: 1; }
+.l-timer-unit { font-size: 6px; color: #ef4444; font-weight: 900; }
+
+.l-stat-status { font-size: 10px; color: #ef4444; font-weight: 700; }
+
+/* Cartela Grid V3 */
+.lobby-content-area {
+  flex: 1;
+  background: #0b0f19;
+  padding: 15px;
+  overflow-y: auto;
+}
+
+.cartela-grid-professional {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+  gap: 10px;
+}
+
+.cartela-chip {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.cartela-chip:active { transform: scale(0.95); }
+
+.is-mine {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-color: #34d399;
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+}
+
+.is-taken {
+  opacity: 0.3;
+  pointer-events: none;
+  filter: grayscale(1);
+}
+
+.chip-id { font-size: 18px; font-weight: 900; color: rgba(255,255,255,0.8); }
+.is-mine .chip-id { color: #fff; }
+
+.chip-indicator {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 6px;
+  height: 6px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 5px #fff;
+}
+
+/* Lobby Footer V2 */
+.lobby-footer-v2 {
+  padding: 20px;
+  background: #111827;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.selection-tray {
+  margin-bottom: 15px;
+  min-height: 30px;
+}
+
+.tray-empty { text-align: center; font-size: 13px; color: rgba(255,255,255,0.3); font-style: italic; }
+.tray-cards { display: flex; gap: 10px; justify-content: center; }
+.tray-card {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.lobby-play-btn {
+  width: 100%;
+  height: 54px;
+  border-radius: 14px;
+  border: none;
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  transition: all 0.3s;
+}
+
+.btn-active {
+  background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
+  color: #000;
+  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
+}
+
+.btn-dim {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.2);
+}
+

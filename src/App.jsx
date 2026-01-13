@@ -138,6 +138,7 @@ function App() {
                                 onPlay={handlePlay}
                                 appName={branding.appName}
                                 appLogo={branding.appLogo}
+                                userBalance={user?.playBalance || 0}
                                 t={t}
                             />
                         )}

@@ -244,15 +244,23 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
             {/* Winner Modal */}
             {winner && (
                 <div className="bingo-modal-overlay">
-                    <div className="bingo-modal-content upscale-reveal">
+                    <div className="bingo-modal-content upscale-reveal gold-border">
                         <div className="crown-icon-wrapper">
                             <Trophy size={80} className="floating-crown" />
                         </div>
-                        <h1 className="bingo-title">BINGO!</h1>
+                        <h1 className="bingo-title glow-text">BINGO!</h1>
                         <div className="winner-announcement">
                             <span className="party-emoji">🎉</span>
-                            <span className="winner-name">{winner.username} WON!</span>
+                            <div className="winner-details">
+                                <span className="winner-name">{winner.username} WON!</span>
+                                {winner.phoneNumber && <span className="winner-phone">{winner.phoneNumber}</span>}
+                            </div>
                             <span className="party-emoji">🎉</span>
+                        </div>
+
+                        <div className="prize-sum-v2">
+                            <div className="prize-label">TOTAL PRIZE</div>
+                            <div className="prize-val-v2">{winner.prize} <small>Birr</small></div>
                         </div>
 
                         <div className="winning-card-preview">
@@ -274,16 +282,12 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                             </div>
                         </div>
 
-                        <div className="prize-sum">
-                            <span className="prize-val">{winner.prize} <small>Birr</small></span>
-                        </div>
-
                         <div className="next-game-ticker">
                             <div className="ticker-dot"></div>
-                            Auto-starting next game in 10s
+                            Auto-starting next round shortly...
                         </div>
 
-                        <button className="continue-btn" onClick={() => onGameOver()}>
+                        <button className="continue-btn prestige-action" onClick={() => onGameOver()}>
                             CONTINUE
                         </button>
                     </div>
