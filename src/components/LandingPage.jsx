@@ -1,71 +1,79 @@
 import React, { useState } from 'react';
-import { Play, Trophy, Users, History, Wallet, User, HelpCircle } from 'lucide-react';
+import { Play, Trophy, Users, History, Wallet, HelpCircle, Heart } from 'lucide-react';
 
 const LandingPage = ({ onPlay, appName, appLogo, t, userBalance = 0 }) => {
     const [showRules, setShowRules] = useState(false);
+
+    // Premium Stats with Bilingual Labels
     const stats = [
-        { label: t.activePlayers, value: '45K+', icon: <Users size={20} /> },
-        { label: t.gamesPlayed, value: '60K+', icon: <History size={20} /> },
-        { label: t.winnersDaily, value: '500+', icon: <Trophy size={20} /> },
+        { labelEn: 'Active Players', labelAm: 'ንቁ ተጫዋቾች', value: '45K+', icon: <Users size={20} /> },
+        { labelEn: 'Games Played', labelAm: 'የተጫወቱ ጨዋታዎች', value: '60K+', icon: <History size={20} /> },
+        { labelEn: 'Winners Daily', labelAm: 'ዕለታዊ አሸናፊዎች', value: '500+', icon: <Trophy size={20} /> },
     ];
+
+    // Premium Logo Path (New Generate Asset)
+    const premiumLogo = "C:\\Users\\MEGAUPLOAD\\.gemini\\antigravity\\brain\\f034a63b-897b-4788-894d-312ced5ea814\\fikir_bingo_premium_logo_1768303669555.png";
 
     return (
         <div className="landing-container">
-            <header className="landing-header">
+            <header className="landing-header animate-reveal delay-1">
                 <div className="logo-section">
-                    {appLogo ? (
-                        <img src={appLogo} alt="Logo" className="app-logo-img" />
-                    ) : (
-                        <div className="logo-b">F</div>
-                    )}
-                    <h1>Fikir Bingo</h1>
+                    <div className="premium-logo-wrapper">
+                        <img src={premiumLogo} alt="Fikir Bingo" className="premium-logo-img" />
+                    </div>
                 </div>
-                <button className="rules-btn" onClick={() => setShowRules(true)}>
+                <button className="rules-btn prestige-btn" onClick={() => setShowRules(true)}>
                     <HelpCircle size={18} />
-                    <span>{t.rules}</span>
+                    <span>{t.rules} (Rules)</span>
                 </button>
             </header>
 
             <main className="landing-main">
-                <div className="welcome-section">
-                    <h2>{t.welcome} <span>Fikir Bingo</span></h2>
+                <div className="welcome-section animate-reveal delay-2">
+                    <h2 className="brilliant-text">
+                        <span>{t.welcome} (Welcome to)</span>
+                        Fikir Bingo
+                    </h2>
                     <p className="welcome-sub">Real-time multiplayer bingo. Big stakes, big wins.</p>
                 </div>
 
-                <div className="stake-card premium-card">
+                <div className="stake-card premium-card animate-reveal delay-3">
                     <div className="stake-header">
-                        <span className="available-stakes-label">Available Stakes</span>
-                        <div className="wallet-pill">
+                        <span className="available-stakes-label">Available Stakes (መጠኖች)</span>
+                        <div className="wallet-pill gold-glow">
                             <Wallet size={12} className="wallet-icon-mini" />
                             {userBalance} Birr
                         </div>
                     </div>
 
                     <div className="stake-options">
-                        {[10, 50, 100].map((val) => (
+                        {[10, 50, 100].map((val, idx) => (
                             <button
                                 key={val}
-                                className="stake-btn-premium"
+                                className={`stake-btn-premium chip-style delay-${idx + 1}`}
                                 onClick={() => onPlay(val)}
                             >
                                 <span className="stake-val">{val}</span>
-                                <span className="stake-unit">Birr</span>
+                                <span className="stake-unit">Birr (ብር)</span>
                             </button>
                         ))}
                     </div>
 
-                    <button className="play-btn pulse" onClick={() => onPlay(10)}>
+                    <button className="play-btn prestige-action pulse" onClick={() => onPlay(10)}>
                         <Play size={22} fill="currentColor" />
-                        {t.playNow}
+                        {t.playNow} (Play Now)
                     </button>
                 </div>
 
-                <div className="stats-grid">
+                <div className="stats-grid animate-reveal delay-3">
                     {stats.map((stat, i) => (
-                        <div key={i} className="stat-card premium-card">
-                            <div className="stat-icon-wrapper">{stat.icon}</div>
+                        <div key={i} className="stat-card premium-card glass-panel">
+                            <div className="stat-icon-wrapper pulse-soft">{stat.icon}</div>
                             <span className="stat-value">{stat.value}</span>
-                            <span className="stat-label">{stat.label}</span>
+                            <div className="stat-bilingual-label">
+                                <span className="am">{stat.labelAm}</span>
+                                <span className="en">{stat.labelEn}</span>
+                            </div>
                         </div>
                     ))}
                 </div>
@@ -73,26 +81,29 @@ const LandingPage = ({ onPlay, appName, appLogo, t, userBalance = 0 }) => {
 
             {showRules && (
                 <div className="modal-overlay" onClick={() => setShowRules(false)}>
-                    <div className="modal-content premium-card" onClick={e => e.stopPropagation()}>
+                    <div className="modal-content premium-card glass-modal" onClick={e => e.stopPropagation()}>
                         <div className="modal-header">
-                            <h3>Game Rules 📖</h3>
+                            <h3>{t.rules} (Game Rules) 📖</h3>
                             <button className="close-modal" onClick={() => setShowRules(false)}>&times;</button>
                         </div>
                         <div className="rules-list">
                             {[
-                                "Choose 1 or 2 cartelas (cards) with your preferred stake (10 - 100 Birr).",
-                                "Wait for the live round to start. Numbers are called every 5 seconds.",
-                                "System automatically marks called numbers on your cards in real-time.",
-                                "First player to complete a full line wins the entire prize pool!",
-                                "House takes a 15% commission. Payouts are instant."
+                                { en: "Choose 1 or 2 cartelas (cards) with your preferred stake (10 - 100 Birr).", am: "በመረጡት መጠን (ከ10 - 100 ብር) 1 ወይም 2 ካርቴላዎችን ይምረጡ።" },
+                                { en: "Wait for the live round to start. Numbers are called every 5 seconds.", am: "ጨዋታው እስኪጀምር ይጠብቁ። ቁጥሮች በየ 5 ሰከንዱ ይጠራሉ።" },
+                                { en: "System automatically marks called numbers on your cards in real-time.", am: "ሲስተሙ የተጠሩትን ቁጥሮች በራሱ ምልክት ያደርጋል።" },
+                                { en: "First player to complete a full line wins the entire prize pool!", am: "አንድ መስመር ቀድሞ የጨረሰ ተጫዋች አጠቃላይ ሽልማቱን ያሸንፋል!" },
+                                { en: "House takes a 15% commission. Payouts are instant.", am: "ሲስተሙ 15% ኮሚሽን ይወስዳል። ክፍያ ወዲያውኑ ይፈጸማል።" }
                             ].map((rule, i) => (
-                                <div key={i} className="rule-item">
-                                    <span className="rule-step">{i + 1}</span>
-                                    <p>{rule}</p>
+                                <div key={i} className="rule-item-premium">
+                                    <div className="rule-step-badge">{i + 1}</div>
+                                    <div className="rule-text-container">
+                                        <p className="rule-am">{rule.am}</p>
+                                        <p className="rule-en">{rule.en}</p>
+                                    </div>
                                 </div>
                             ))}
                         </div>
-                        <button className="play-btn" onClick={() => setShowRules(false)}>Got it!</button>
+                        <button className="play-btn prestige-action" onClick={() => setShowRules(false)}>ጎበዝ! (Got it!)</button>
                     </div>
                 </div>
             )}
