@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Play, Trophy, Users, History, Wallet, HelpCircle } from 'lucide-react';
+import { logoBase64 } from '../assets/logo';
 
 const LandingPage = ({ onPlay, appName, appLogo, t, userBalance = 0 }) => {
     const [showRules, setShowRules] = useState(false);
@@ -11,8 +12,8 @@ const LandingPage = ({ onPlay, appName, appLogo, t, userBalance = 0 }) => {
         { label: t.winnersDaily, value: '500+', icon: <Trophy size={20} /> },
     ];
 
-    // Placeholder for logo if missing
-    const defaultLogo = "https://cdn-icons-png.flaticon.com/512/3408/3408545.png";
+    // Authentic premium logo
+    const authenticLogo = logoBase64;
 
     return (
         <div className="landing-container">
@@ -20,10 +21,9 @@ const LandingPage = ({ onPlay, appName, appLogo, t, userBalance = 0 }) => {
                 <div className="logo-section">
                     <div className="premium-logo-wrapper">
                         <img
-                            src={appLogo || defaultLogo}
+                            src={authenticLogo}
                             alt="Fikir Bingo"
                             className="premium-logo-img"
-                            onError={(e) => { e.target.src = defaultLogo; }}
                         />
                     </div>
                 </div>
