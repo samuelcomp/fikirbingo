@@ -101,6 +101,10 @@ function App() {
     };
 
     const handlePlay = (amount) => {
+        if (mustRegister) {
+            alert(t.mustRegisterError);
+            return;
+        }
         setStake(amount);
         setView('lobby');
     };
@@ -204,7 +208,10 @@ function App() {
                         <Home size={22} />
                         <span>LOBBY</span>
                     </button>
-                    <button className={`nav-item ${view === 'leaderboard' ? 'active' : ''}`} onClick={() => setView('leaderboard')}>
+                    <button className={`nav-item ${view === 'leaderboard' ? 'active' : ''}`} onClick={() => {
+                        if (mustRegister) alert(t.mustRegisterError);
+                        else setView('leaderboard');
+                    }}>
                         <TrophyIcon size={22} />
                         <span>RANKING</span>
                     </button>
@@ -212,11 +219,17 @@ function App() {
                         <Gamepad2 size={22} />
                         <span>GAMES</span>
                     </button>
-                    <button className={`nav-item ${view === 'wallet' ? 'active' : ''}`} onClick={() => setView('wallet')}>
+                    <button className={`nav-item ${view === 'wallet' ? 'active' : ''}`} onClick={() => {
+                        if (mustRegister) alert(t.mustRegisterError);
+                        else setView('wallet');
+                    }}>
                         <Wallet size={22} />
                         <span>{t.wallet || 'WALLET'}</span>
                     </button>
-                    <button className={`nav-item ${view === 'profile' ? 'active' : ''}`} onClick={() => setView('profile')}>
+                    <button className={`nav-item ${view === 'profile' ? 'active' : ''}`} onClick={() => {
+                        if (mustRegister) alert(t.mustRegisterError);
+                        else setView('profile');
+                    }}>
                         <UserIcon size={22} />
                         <span>{t.profile || 'ME'}</span>
                     </button>

@@ -27,6 +27,7 @@ export const translations = {
         registrationTitle: "Registration 📝",
         registrationDesc: "To start playing, please share your contact number found in your Telegram account.",
         shareContact: "Share Contact 📱",
+        mustRegisterError: "You must register to access this feature.",
     },
     am: {
         welcome: "እንኳን ደህና መጡ ወደ",
@@ -56,5 +57,6 @@ export const translations = {
         registrationTitle: "ምዝገባ 📝",
         registrationDesc: "መጫወት ለመጀመር እባክዎን በቴሌግራም መለያዎ ውስጥ የሚገኘውን የመገናኛ ቁጥርዎን ያጋሩ።",
         shareContact: "ስልክ ቁጥር ያጋሩ 📱",
+        mustRegisterError: "ይህንን ክፍል ለመጠቀም እባክዎ መጀመሪያ ይመዝገቡ።",
     }
 };
