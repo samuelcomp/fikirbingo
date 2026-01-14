@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
-import { ChevronLeft, RotateCcw } from 'lucide-react';
+import { ChevronLeft, RotateCcw, MonitorPlay, Check, Loader2 } from 'lucide-react';
 
 const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\s/g, '');
-// Socket is now initialized inside the component to include the auth token
 
 const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
     const [socket, setSocket] = useState(null);
@@ -17,7 +16,7 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
 
     useEffect(() => {
         const token = localStorage.getItem('userToken');
-        if (!token || !user?.id) return;
+        if (!token || !user?.telegramId) return;
 
         const s = io(API_URL, {
             auth: { token },
@@ -25,7 +24,7 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
         });
         setSocket(s);
 
-        const userId = user.id;
+        const telegramId = user.telegramId;
         s.emit('join_room', { roomId });
 
         s.on('room_state', (data) => {
@@ -36,8 +35,8 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
                 setPlayersCount(data.playersCount || 0);
                 setPrizePool(data.prizePool || 0);
 
-                // Sync our selection with server
-                const myTaken = data.takenCartelas?.[userId] || [];
+                // Sync our selection with server using telegramId
+                const myTaken = data.takenCartelas?.[telegramId] || [];
                 setSelectedIds(myTaken);
             }
         });
@@ -48,18 +47,17 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
                 setRoomStatus(data.status);
                 setPlayersCount(data.playersCount || 0);
                 setPrizePool(data.prizePool || 0);
-            }
-        });
 
-        s.on('game_started', () => {
-            // Can't easily use selectedIds here due to closure, 
-            // but the footer button click usually handles transition
+                if (data.status === 'PLAYING') {
+                    setRoomStatus('PLAYING');
+                }
+            }
         });
 
         return () => {
             s.disconnect();
         };
-    }, [roomId, user?.id]);
+    }, [roomId, user?.telegramId]);
 
     // Auto-transition to Game/Spectator when status is PLAYING
     useEffect(() => {
@@ -100,7 +98,7 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
         if (roomStatus !== 'WAITING' || !socket) return;
 
         const allTaken = Object.entries(takenCartelas)
-            .filter(([uid]) => uid !== user?.id)
+            .filter(([tid]) => tid !== user?.telegramId)
             .flatMap(([_, ids]) => ids);
 
         if (allTaken.includes(id)) return;
@@ -114,7 +112,7 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
 
     const isTakenByOther = (id) => {
         return Object.entries(takenCartelas)
-            .some(([uid, ids]) => uid !== user?.id && ids.includes(id));
+            .some(([tid, ids]) => tid !== user?.telegramId && ids.includes(id));
     };
 
     const getBallColor = (num) => {
@@ -130,14 +128,16 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
         const columns = ['B', 'I', 'N', 'G', 'O'];
 
         return (
-            <div key={id} className="preview-card-v2">
-                <div className="preview-label-v2">Cartela No : {id}</div>
-                <div className="bingo-grid-mini">
+            <div key={id} className="preview-card-v3 upscale-reveal">
+                <div className="preview-header-v3">
+                    <span>Cartela No : {id}</span>
+                </div>
+                <div className="bingo-grid-mini-v3">
                     {columns.map((col, idx) => (
-                        <div key={col} className="bingo-col-mini">
-                            <div className="col-header-mini" style={{ backgroundColor: getBallColor(idx * 15 + 1) }}>{col}</div>
+                        <div key={col} className="bingo-col-mini-v3">
+                            <div className="col-header-mini-v3" style={{ backgroundColor: getBallColor(idx * 15 + 1) }}>{col}</div>
                             {card.numbers[col].map((num, i) => (
-                                <div key={i} className="mini-cell">
+                                <div key={i} className={`mini-cell-v3 ${num === 'FREE' ? 'free' : ''}`}>
                                     {num === 'FREE' ? <span className="free-star">✨</span> : num}
                                 </div>
                             ))}
@@ -148,77 +148,97 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
         );
     };
 
+    const selectionProgress = (selectedIds.length / 2) * 100;
+
     return (
-        <div className="lobby-container-v2">
-            <header className="lobby-header-nav">
-                <button className="nav-btn-v2" onClick={() => window.history.back()}>
-                    <ChevronLeft size={20} />
+        <div className="lobby-container-v3">
+            <header className="lobby-header-v3">
+                <button className="header-action-btn back" onClick={() => window.history.back()}>
+                    <ChevronLeft size={22} />
                     <span>Back</span>
                 </button>
-                <button className="nav-btn-v2" onClick={() => window.location.reload()}>
+                <button className="header-action-btn refresh" onClick={() => window.location.reload()}>
                     <RotateCcw size={18} />
                     <span>Refresh</span>
                 </button>
             </header>
 
-            <div className="status-row-v2">
-                <div className="stat-pill-v2">
-                    <span className="pill-title">Main Wallet</span>
-                    <span className="pill-val">{user?.mainBalance || 0}</span>
+            <div className="lobby-status-grid">
+                <div className="status-box">
+                    <span className="box-label">Main Wallet</span>
+                    <span className="box-value">{user?.mainBalance || 0}</span>
                 </div>
-                <div className="stat-pill-v2">
-                    <span className="pill-title">Play Wallet</span>
-                    <span className="pill-val">{user?.playBalance || 0}</span>
+                <div className="status-box">
+                    <span className="box-label">Play Wallet</span>
+                    <span className="box-value">{user?.playBalance || 0}</span>
                 </div>
-                <div className="stat-pill-v2">
-                    <span className="pill-title">Stake</span>
-                    <span className="pill-val">{stake}</span>
+                <div className="status-box">
+                    <span className="box-label">Stake</span>
+                    <span className="box-value">{stake}</span>
                 </div>
-                <div className="stat-pill-v2 timer-pill">
-                    <span className="pill-val">{countdown} <small>s</small></span>
-                </div>
-                <div className={`stat-pill-v2 selection-pill ${selectedIds.length === 2 ? 'full' : ''}`}>
-                    <span className="pill-title">Cards</span>
-                    <span className="pill-val">{selectedIds.length}/2</span>
+                <div className="status-box highlight">
+                    <span className="box-value">{countdown} s</span>
                 </div>
             </div>
 
-            <main className="cartela-selection-main">
-                <div className="cartela-grid-v2-scroll">
+            <div className="selection-progress-bar">
+                <div className="progress-info">
+                    <span>Select 2 Cartelas to Play</span>
+                    <span className={selectedIds.length === 2 ? 'ready' : ''}>
+                        {selectedIds.length}/2 {selectedIds.length === 2 && 'Ready! ✅'}
+                    </span>
+                </div>
+                <div className="progress-track">
+                    <div className="progress-fill" style={{ width: `${selectionProgress}%` }}></div>
+                </div>
+            </div>
+
+            <main className="lobby-main-grid-area">
+                <div className="cartela-chips-scroll">
                     {Array.from({ length: 400 }, (_, i) => i + 1).map(id => {
                         const isMine = selectedIds.includes(id);
                         const isOther = isTakenByOther(id);
                         return (
                             <div
                                 key={id}
-                                className={`grid-chip-v2 ${isMine ? 'mine' : ''} ${isOther ? 'other' : ''}`}
+                                className={`cartela-chip-v3 ${isMine ? 'mine' : ''} ${isOther ? 'other' : ''}`}
                                 onClick={() => toggleCartela(id)}
                             >
                                 {id}
+                                {isMine && <Check size={10} className="chip-check" />}
+                                {isOther && <div className="chip-indicator" />}
                             </div>
                         );
                     })}
                 </div>
             </main>
 
-            <footer className="lobby-footer-previews">
-                <div className="previews-container-v2">
+            <footer className="lobby-footer-v3">
+                <div className="previews-row">
                     {selectedIds.length > 0 ? (
                         selectedIds.map(renderPreview)
                     ) : (
-                        <div className="preview-placeholder">Select up to 2 cards to preview</div>
+                        <div className="previews-placeholder-v3">
+                            <MonitorPlay size={40} strokeWidth={1} />
+                            <p>Select your cartelas to see preview</p>
+                        </div>
                     )}
                 </div>
-                <button
-                    className={`lobby-play-btn-v2 ${selectedIds.length > 0 || roomStatus === 'PLAYING' ? 'active' : ''}`}
-                    disabled={selectedIds.length === 0 && roomStatus === 'WAITING'}
-                    onClick={() => {
-                        const cards = selectedIds.map(id => generateDeterministicCard(id));
-                        onGameStart(cards);
-                    }}
-                >
-                    {roomStatus === 'PLAYING' ? 'WATCH LIVE GAME 🎥' : 'CONFIRM SELECTION'}
-                </button>
+
+                {roomStatus === 'PLAYING' ? (
+                    <button className="watch-live-btn-v3" onClick={() => onGameStart([])}>
+                        <Loader2 className="spinning" size={18} />
+                        WATCH LIVE GAME 🎥
+                    </button>
+                ) : (
+                    <div className="lobby-action-info">
+                        {selectedIds.length < 2 ? (
+                            <p className="hint-text">Select {2 - selectedIds.length} more to play</p>
+                        ) : (
+                            <p className="success-text">Waiting for game to start... ⏳</p>
+                        )}
+                    </div>
+                )}
             </footer>
         </div>
     );
