@@ -3965,3 +3965,42 @@ input:checked+.slider-v3:before {
 .spinning { animation: spin 2s linear infinite; }
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
+
+
+/* Multi-Winner Modal Styles */
+.winners-list-container {
+  max-height: 50vh;
+  overflow-y: auto;
+  margin: 15px 0;
+  padding: 0 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.winner-record-v2 {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+}
+
+.winner-divider {
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin: 10px 0;
+}
+
+.winning-card-preview.small {
+  transform: scale(0.9);
+  transform-origin: top center;
+  margin-top: -10px;
+}
+
+.winning-card-preview.small .preview-label {
+    font-size: 11px;
+    margin-bottom: 5px;
+}
+

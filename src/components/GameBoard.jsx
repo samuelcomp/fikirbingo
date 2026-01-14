@@ -259,43 +259,53 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                         <div className="crown-icon-wrapper">
                             <Trophy size={80} className="floating-crown" />
                         </div>
-                        <h1 className="bingo-title glow-text">BINGO!</h1>
-                        <div className="winner-announcement">
-                            <span className="party-emoji">🎉</span>
-                            <div className="winner-details">
-                                <span className="winner-name">{winner.username} WON!</span>
-                                {winner.phoneNumber && <span className="winner-phone">{winner.phoneNumber}</span>}
-                            </div>
-                            <span className="party-emoji">🎉</span>
-                        </div>
+                        <h1 className="bingo-title glow-text">
+                            {Array.isArray(winner) && winner.length > 1 ? `${winner.length} BINGOS!` : 'BINGO!'}
+                        </h1>
 
-                        <div className="prize-sum-v2">
-                            <div className="prize-label">TOTAL PRIZE</div>
-                            <div className="prize-val-v2">{winner.prize} <small>Birr</small></div>
-                        </div>
-
-                        <div className="winning-card-preview">
-                            <div className="preview-label">🏆 Winning Cartela : {winner.cartelaId}</div>
-                            <div className="bingo-grid-5x5 mini">
-                                {['B', 'I', 'N', 'G', 'O'].map(col => (
-                                    <div key={col} className="bingo-column">
-                                        <div className="col-header" style={{ color: getBallColor(['B', 'I', 'N', 'G', 'O'].indexOf(col) * 15 + 1) }}>{col}</div>
-                                        {winner.officialCard?.numbers[col].map((num, i) => {
-                                            const isMarked = gameState.calledNumbers.includes(num) || num === 'FREE';
-                                            return (
-                                                <div key={i} className={`mini-num ${isMarked ? 'marked' : ''}`}>
-                                                    {num === 'FREE' ? '✨' : num}
-                                                </div>
-                                            );
-                                        })}
+                        <div className="winners-list-container">
+                            {(Array.isArray(winner) ? winner : [winner]).map((w, idx) => (
+                                <div key={idx} className="winner-record-v2">
+                                    <div className="winner-announcement">
+                                        <span className="party-emoji">🎉</span>
+                                        <div className="winner-details">
+                                            <span className="winner-name">{w.username} WON!</span>
+                                            {w.phoneNumber && <span className="winner-phone">{w.phoneNumber}</span>}
+                                        </div>
+                                        <span className="party-emoji">🎉</span>
                                     </div>
-                                ))}
-                            </div>
+
+                                    <div className="prize-sum-v2">
+                                        <div className="prize-label">PRIZE</div>
+                                        <div className="prize-val-v2">{w.prize} <small>Birr</small></div>
+                                    </div>
+
+                                    <div className="winning-card-preview small">
+                                        <div className="preview-label">🏆 Cartela : {w.cartelaId}</div>
+                                        <div className="bingo-grid-5x5 mini">
+                                            {['B', 'I', 'N', 'G', 'O'].map(col => (
+                                                <div key={col} className="bingo-column">
+                                                    <div className="col-header" style={{ color: getBallColor(['B', 'I', 'N', 'G', 'O'].indexOf(col) * 15 + 1) }}>{col}</div>
+                                                    {w.officialCard?.numbers[col].map((num, i) => {
+                                                        const isMarked = gameState.calledNumbers.includes(num) || num === 'FREE';
+                                                        return (
+                                                            <div key={i} className={`mini-num ${isMarked ? 'marked' : ''}`}>
+                                                                {num === 'FREE' ? '✨' : num}
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    {idx < (Array.isArray(winner) ? winner.length : 1) - 1 && <hr className="winner-divider" />}
+                                </div>
+                            ))}
                         </div>
 
                         <div className="next-game-ticker">
                             <div className="ticker-dot"></div>
-                            Auto-starting next round shortly...
+                            Auto-starting next round...
                         </div>
 
                         <button className="continue-btn prestige-action" onClick={() => onGameOver()}>
