@@ -1,170 +1,98 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Wallet, ArrowUpCircle, ArrowDownCircle, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { Wallet, Clock, CheckCircle, RotateCcw } from 'lucide-react';
 
 const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\s/g, '');
 
 const WalletDashboard = ({ user, onUpdateUser, t }) => {
     const [history, setHistory] = useState([]);
-    const [amount, setAmount] = useState('');
-    const [reference, setReference] = useState('');
+    const [activeTab, setActiveTab] = useState('balance');
     const [isLoading, setIsLoading] = useState(false);
-    const [activeTab, setActiveTab] = useState('deposit');
 
     useEffect(() => {
         fetchHistory();
     }, []);
 
     const fetchHistory = async () => {
+        setIsLoading(true);
         try {
             const token = localStorage.getItem('userToken');
-            if (!token) {
-                // In dev mode, we might not have a token
-                setHistory([]);
-                return;
-            }
+            if (!token) return;
             const res = await axios.get(`${API_URL}/api/wallet/history`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             setHistory(Array.isArray(res.data) ? res.data : []);
         } catch (e) {
-            console.error('Wallet fetch failed:', e.response?.status);
-            setHistory([]);
-        }
-    };
-
-    const handleDeposit = async () => {
-        if (!amount || !reference) return alert('Please fill all fields');
-        setIsLoading(true);
-        try {
-            const token = localStorage.getItem('userToken');
-            await axios.post(`${API_URL}/api/wallet/deposit`,
-                { amount, reference, bank: 'Telebirr' },
-                { headers: { 'Authorization': `Bearer ${token}` } }
-            );
-            alert('Deposit request submitted! Waiting for admin approval.');
-            setAmount('');
-            setReference('');
-            fetchHistory();
-        } catch (e) {
-            alert('Submission failed. Check your reference code.');
+            console.error('Wallet fetch failed');
         } finally {
             setIsLoading(false);
-        }
-    };
-
-    const handleWithdraw = async () => {
-        if (!amount || amount < 50) return alert('Minimum withdrawal is 50 Birr');
-        setIsLoading(true);
-        try {
-            const token = localStorage.getItem('userToken');
-            await axios.post(`${API_URL}/api/wallet/withdraw`,
-                { amount, bank: 'Telebirr' },
-                { headers: { 'Authorization': `Bearer ${token}` } }
-            );
-            alert('Withdrawal request submitted!');
-            setAmount('');
-            fetchHistory();
-            onUpdateUser();
-        } catch (e) {
-            alert(e.response?.data?.error || 'Withdrawal failed');
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const getStatusIcon = (status) => {
-        switch (status) {
-            case 'COMPLETED': return <CheckCircle size={16} className="status-completed" />;
-            case 'REJECTED': return <XCircle size={16} className="status-rejected" />;
-            default: return <Clock size={16} className="status-pending" />;
         }
     };
 
     return (
-        <div className="wallet-container">
-            <div className="balance-hero premium-card">
-                <div className="balance-item">
-                    <span className="label">{t.playBalance}</span>
-                    <span className="value" style={{ color: 'var(--accent)' }}>{user?.playBalance || 0} <small>B</small></span>
+        <div className="wallet-container-v2">
+            <header className="dashboard-header-v2">
+                <h1 className="dashboard-title-v2">Wallet</h1>
+                <button className="refresh-btn-v2" onClick={fetchHistory} disabled={isLoading}>
+                    <RotateCcw size={20} className={isLoading ? 'spinning' : ''} />
+                </button>
+            </header>
+
+            <div className="verified-user-banner-v2">
+                <div className="user-info-v2">
+                    <div className="user-icon-circle-v2">
+                        <Wallet size={18} />
+                    </div>
+                    <span className="user-phone-number-v2">{user?.phoneNumber || '0900000000'}</span>
                 </div>
-                <div className="balance-divider"></div>
-                <div className="balance-item" style={{ textAlign: 'right' }}>
-                    <span className="label">{t.cashBalance}</span>
-                    <span className="value" style={{ color: 'var(--secondary)' }}>{user?.mainBalance || 0} <small>B</small></span>
+                <div className="verified-pill-v2">
+                    <CheckCircle size={14} />
+                    <span>Verified</span>
                 </div>
             </div>
 
-            <div className="wallet-actions premium-card">
-                <div className="wallet-tabs">
-                    <button
-                        className={`tab-btn ${activeTab === 'deposit' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('deposit')}
-                    >
-                        {t.deposit}
-                    </button>
-                    <button
-                        className={`tab-btn ${activeTab === 'withdraw' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('withdraw')}
-                    >
-                        {t.withdraw}
-                    </button>
-                </div>
+            <div className="action-tabs-v2">
+                <button
+                    className={`action-tab-v2 ${activeTab === 'balance' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('balance')}
+                >
+                    Balance
+                </button>
+                <button
+                    className={`action-tab-v2 ${activeTab === 'history' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('history')}
+                >
+                    History
+                </button>
+            </div>
 
-                {activeTab === 'deposit' ? (
-                    <div className="action-form">
-                        <div className="info-alert">
-                            <p>Send money to <strong style={{ color: 'var(--accent)' }}>0912xxxxxx</strong> (Telebirr) and enter the reference number below.</p>
+            <h2 className="section-subtitle-v2">Recent Transactions</h2>
+
+            <div className="transaction-list-v2">
+                {history.length > 0 ? (
+                    history.map((tx, i) => (
+                        <div key={tx.id} className="transaction-card-v2 upscale-reveal" style={{ animationDelay: `${i * 0.05}s` }}>
+                            <div className="tx-icon-v2">
+                                <div className="wallet-icon-box-v2">
+                                    <Wallet size={18} color="#3b82f6" />
+                                </div>
+                            </div>
+                            <div className="tx-details-v2">
+                                <span className="tx-type-v2">{tx.type}</span>
+                                <span className="tx-date-v2">{new Date(tx.createdAt).toLocaleString()}</span>
+                            </div>
+                            <div className="tx-outcome-v2">
+                                <span className="tx-amount-v2">{tx.amount}</span>
+                                <span className="tx-status-v2 approved">Approved</span>
+                            </div>
                         </div>
-                        <div className="input-group">
-                            <label className="input-label">Amount (Birr)</label>
-                            <input type="number" className="pro-input" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0.00" />
-                        </div>
-                        <div className="input-group">
-                            <label className="input-label">SMS Reference Code</label>
-                            <input type="text" className="pro-input" value={reference} onChange={(e) => setReference(e.target.value)} placeholder="ABC123XYZ" />
-                        </div>
-                        <button className="play-btn" onClick={handleDeposit} disabled={isLoading}>
-                            {isLoading ? 'Processing...' : `Request ${t.deposit}`}
-                        </button>
-                    </div>
+                    ))
                 ) : (
-                    <div className="action-form">
-                        <div className="info-alert" style={{ borderLeftColor: 'var(--secondary)' }}>
-                            <p>Min: 50 Birr. 5 Birr processing fee applies.</p>
-                        </div>
-                        <div className="input-group">
-                            <label className="input-label">Withdrawal Amount</label>
-                            <input type="number" className="pro-input" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0.00" />
-                        </div>
-                        <button className="play-btn" onClick={handleWithdraw} disabled={isLoading} style={{ background: 'linear-gradient(135deg, var(--secondary), hsl(174, 100%, 31%))' }}>
-                            {isLoading ? 'Processing...' : t.withdraw}
-                        </button>
+                    <div className="no-transactions-v2">
+                        <Clock size={48} strokeWidth={1} />
+                        <p>No transactions found</p>
                     </div>
                 )}
-            </div>
-
-            <div className="history-section">
-                <h3 className="section-title" style={{ fontSize: '20px', fontWeight: 900, marginBottom: '20px' }}>{t.history}</h3>
-                <div className="history-list">
-                    {Array.isArray(history) && history.map(tx => (
-                        <div key={tx.id} className="history-item premium-card">
-                            <div className="tx-icon-box">
-                                {tx.type === 'DEPOSIT' || tx.type === 'WIN' ? <ArrowDownCircle color="var(--success)" /> : <ArrowUpCircle color="var(--primary)" />}
-                            </div>
-                            <div className="tx-main-info">
-                                <span className="tx-title">{tx.type}</span>
-                                <span className="tx-sub">{new Date(tx.createdAt).toLocaleDateString()}</span>
-                            </div>
-                            <div className="tx-amount-box">
-                                <span className="tx-val" style={{ color: (tx.type === 'DEPOSIT' || tx.type === 'WIN') ? 'var(--success)' : 'var(--primary)' }}>
-                                    {tx.type === 'DEPOSIT' || tx.type === 'WIN' ? '+' : '-'}{tx.amount}
-                                </span>
-                                <span className="tx-status-text">{tx.status}</span>
-                            </div>
-                        </div>
-                    ))}
-                </div>
             </div>
         </div>
     );

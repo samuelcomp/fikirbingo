@@ -7,7 +7,8 @@ import WalletDashboard from './components/WalletDashboard';
 import ProfilePage from './components/ProfilePage';
 import Leaderboard from './components/Leaderboard';
 import RegisterPage from './components/RegisterPage';
-import { Home, Trophy as TrophyIcon, Wallet, User as UserIcon, Gamepad2 } from 'lucide-react';
+import GameHistory from './components/GameHistory';
+import { Home, Trophy as TrophyIcon, Wallet, User as UserIcon, Gamepad2, History as HistoryIcon, Phone } from 'lucide-react';
 import { translations } from './translations';
 import './index.css';
 
@@ -99,8 +100,9 @@ function App() {
     };
 
     const handleGameOver = () => {
-        console.log('[App] Game over, returning to landing');
-        setView('landing');
+        console.log(`[App] Game over, returning to ${stake} Birr lobby`);
+        setSelectedCartelas([]); // Clear selection for new round
+        setView('lobby'); // Return to the same stake lobby
         fetchUserProfile(); // Refresh balance/stats immediately
     };
 
@@ -171,7 +173,10 @@ function App() {
                             />
                         )}
                         {view === 'leaderboard' && (
-                            <Leaderboard t={t} />
+                            <Leaderboard t={t} user={user} />
+                        )}
+                        {view === 'history' && (
+                            <GameHistory t={t} user={user} />
                         )}
                         {view === 'lobby' && (
                             <CartelaSelection
@@ -224,39 +229,31 @@ function App() {
             </div>
 
             {view !== 'game' && (
-                <nav className="bottom-nav">
-                    <button className={`nav-item ${view === 'landing' ? 'active' : ''}`} onClick={() => setView('landing')}>
-                        <Home size={22} />
-                        <span>HOME</span>
+                <nav className="bottom-nav-v2">
+                    <button className={`nav-item-v2 ${view === 'landing' ? 'active' : ''}`} onClick={() => setView('landing')}>
+                        <Gamepad2 size={24} />
+                        <span>Game</span>
                     </button>
 
-                    {mustRegister ? (
-                        <>
-                            <button className={`nav-item ${view === 'register' ? 'active' : ''}`} onClick={() => setView('register')}>
-                                <UserIcon size={22} />
-                                <span>REGISTER</span>
-                            </button>
-                            <button className="nav-item" onClick={() => alert('Support: @FikirBingoSupport')}>
-                                <Phone size={22} />
-                                <span>SUPPORT</span>
-                            </button>
-                        </>
-                    ) : (
-                        <>
-                            <button className={`nav-item ${view === 'leaderboard' ? 'active' : ''}`} onClick={() => setView('leaderboard')}>
-                                <TrophyIcon size={22} />
-                                <span>RANKING</span>
-                            </button>
-                            <button className={`nav-item ${view === 'wallet' ? 'active' : ''}`} onClick={() => setView('wallet')}>
-                                <Wallet size={22} />
-                                <span>{t.wallet || 'WALLET'}</span>
-                            </button>
-                            <button className={`nav-item ${view === 'profile' ? 'active' : ''}`} onClick={() => setView('profile')}>
-                                <UserIcon size={22} />
-                                <span>{t.profile || 'ME'}</span>
-                            </button>
-                        </>
-                    )}
+                    <button className={`nav-item-v2 ${view === 'leaderboard' ? 'active' : ''}`} onClick={() => setView('leaderboard')}>
+                        <TrophyIcon size={24} />
+                        <span>Scores</span>
+                    </button>
+
+                    <button className={`nav-item-v2 ${view === 'history' ? 'active' : ''}`} onClick={() => setView('history')}>
+                        <HistoryIcon size={24} />
+                        <span>History</span>
+                    </button>
+
+                    <button className={`nav-item-v2 ${view === 'wallet' ? 'active' : ''}`} onClick={() => setView('wallet')}>
+                        <Wallet size={24} />
+                        <span>Wallet</span>
+                    </button>
+
+                    <button className={`nav-item-v2 ${view === 'profile' ? 'active' : ''}`} onClick={() => setView('profile')}>
+                        <UserIcon size={24} />
+                        <span>Profile</span>
+                    </button>
                 </nav>
             )}
         </div>
