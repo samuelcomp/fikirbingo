@@ -31,6 +31,10 @@ function App() {
         initApp();
     }, []);
 
+    useEffect(() => {
+        if (user?.id) fetchUserProfile();
+    }, [view, stake]);
+
     const initApp = async () => {
         try {
             const brandRes = await axios.get(`${API_URL}/api/branding`);
@@ -40,14 +44,20 @@ function App() {
             const token = localStorage.getItem('userToken');
 
             if (initData) {
+                console.log('[App] Auth with initData');
                 const authRes = await axios.post(`${API_URL}/api/auth`, { initData });
                 localStorage.setItem('userToken', authRes.data.token);
                 setUser(authRes.data.user);
                 setMustRegister(authRes.data.mustRegister);
+
+                // If they are NOT in mustRegister state, but we were showing the register page, switch to landing
+                if (!authRes.data.mustRegister && view === 'register') {
+                    setView('landing');
+                }
             } else if (token) {
+                console.log('[App] Auth with token');
                 fetchUserProfile();
             } else {
-                // Initial dev/guest user
                 fetchUserProfile();
             }
         } catch (e) {
@@ -65,6 +75,9 @@ function App() {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 setUser(res.data);
+                if (res.data.phoneNumber) {
+                    setMustRegister(false);
+                }
             } else if (!window.Telegram?.WebApp?.initData) {
                 // Only use dev fallback if definitely NOT in Telegram
                 let devId = sessionStorage.getItem('devOrderId');
@@ -98,13 +111,15 @@ function App() {
     };
 
     const handleGameOver = () => {
+        console.log('[App] Game over, returning to landing');
         setView('landing');
-        fetchUserProfile();
+        fetchUserProfile(); // Refresh balance/stats immediately
     };
 
     const handleLogout = () => {
         localStorage.removeItem('userToken');
         setUser(null);
+        setMustRegister(false);
         setView('landing');
     };
 

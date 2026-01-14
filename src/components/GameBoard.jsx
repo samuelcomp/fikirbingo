@@ -72,10 +72,12 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
         });
 
         socket.on('player_won', (data) => {
+            console.log('🏆 Player won event received:', data);
             setWinner(data);
         });
 
         socket.on('game_reset', () => {
+            console.log('🔄 Game reset event received');
             onGameOver();
         });
 
@@ -208,10 +210,15 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
 
                     <div className="cards-stack-v3">
                         {isWatcher ? (
-                            <div className="watcher-empty-v3">
-                                <Info size={48} opacity={0.3} />
-                                <p>Watching Round</p>
-                                <small>የሚቀጥለውን ዙር ይጠብቁ</small>
+                            <div className="watcher-card-v3 upscale-reveal">
+                                <div className="watching-badge">Watching Only</div>
+                                <div className="watcher-content">
+                                    <div className="watcher-info-icon">
+                                        <Info size={40} />
+                                    </div>
+                                    <p className="watcher-txt-am">የዚህ ዙር ጨዋታ ተጀምሯል። አዲስ ዙር እስኪጀምር እዚህ ይጠብቁ።</p>
+                                    <p className="watcher-txt-en">This round has started. Please stay tuned for the next game.</p>
+                                </div>
                             </div>
                         ) : (
                             selectedCartelas.map(renderCard)

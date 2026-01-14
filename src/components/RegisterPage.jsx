@@ -80,7 +80,12 @@ const RegisterPage = ({ onRegisterSuccess, t, API_URL }) => {
                     )}
                 </button>
 
-                <p className="security-note">🔒 Your data is verified by Telegram security.</p>
+                <div className="registration-footer">
+                    <button className="text-btn" onClick={() => onRegisterSuccess()}>
+                        🔄 Already shared in Bot? Refresh
+                    </button>
+                    <p className="security-note">🔒 Your data is verified by Telegram security.</p>
+                </div>
             </div>
         </div>
     );

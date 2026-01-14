@@ -3549,3 +3549,77 @@ input:checked+.slider-v3:before {
   font-size: 10px;
   color: #f59e0b;
 }
+.registration-footer {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.text-btn {
+  background: none;
+  border: none;
+  color: #fbbf24;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+  opacity: 0.8;
+}
+.text-btn:hover { opacity: 1; }
+
+
+
+/* Spectator Mode V3 Styles */
+.watcher-card-v3 {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+}
+
+.watching-badge {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 20px;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 40px;
+  letter-spacing: 1px;
+}
+
+.watcher-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.watcher-info-icon {
+  color: rgba(255, 255, 255, 0.2);
+  margin-bottom: 20px;
+}
+
+.watcher-txt-am {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.6;
+  color: #ccd6f6;
+  max-width: 80%;
+  margin: 0 auto;
+}
+
+.watcher-txt-en {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 500;
+}
+

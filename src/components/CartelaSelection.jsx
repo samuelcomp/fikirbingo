@@ -197,14 +197,14 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
                     )}
                 </div>
                 <button
-                    className={`lobby-play-btn-v2 ${selectedIds.length > 0 ? 'active' : ''}`}
-                    disabled={selectedIds.length === 0 || roomStatus !== 'WAITING'}
+                    className={`lobby-play-btn-v2 ${selectedIds.length > 0 || roomStatus === 'PLAYING' ? 'active' : ''}`}
+                    disabled={selectedIds.length === 0 && roomStatus === 'WAITING'}
                     onClick={() => {
                         const cards = selectedIds.map(id => generateDeterministicCard(id));
                         onGameStart(cards);
                     }}
                 >
-                    {roomStatus === 'PLAYING' ? 'GAME IN PROGRESS' : 'CONFIRM SELECTION'}
+                    {roomStatus === 'PLAYING' ? 'WATCH LIVE GAME 🎥' : 'CONFIRM SELECTION'}
                 </button>
             </footer>
         </div>
