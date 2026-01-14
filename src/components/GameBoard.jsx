@@ -109,26 +109,29 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
         return 'O';
     };
 
-    const renderCard = (card) => (
-        <div key={card.id} className="game-card-v3 upscale-reveal">
-            <div className="bingo-grid-5x5-v3">
-                {['B', 'I', 'N', 'G', 'O'].map((col, idx) => (
-                    <div key={col} className="bingo-col-v3">
-                        <div className="col-header-v3" style={{ backgroundColor: getBallColor(idx * 15 + 1) }}>{col}</div>
-                        {card.numbers[col].map((num, i) => {
-                            const isMarked = gameState.calledNumbers.includes(num) || num === 'FREE';
-                            return (
-                                <div key={i} className={`mini-num-v3 ${isMarked ? 'marked' : ''}`}>
-                                    {num === 'FREE' ? <span className="free-star">✨</span> : num}
-                                </div>
-                            );
-                        })}
-                    </div>
-                ))}
+    const renderCard = (card) => {
+        if (!card || !card.numbers) return null;
+        return (
+            <div key={card.id} className="game-card-v3 upscale-reveal">
+                <div className="bingo-grid-5x5-v3">
+                    {['B', 'I', 'N', 'G', 'O'].map((col, idx) => (
+                        <div key={col} className="bingo-col-v3">
+                            <div className="col-header-v3" style={{ backgroundColor: getBallColor(idx * 15 + 1) }}>{col}</div>
+                            {(card.numbers[col] || []).map((num, i) => {
+                                const isMarked = gameState.calledNumbers.includes(num) || num === 'FREE';
+                                return (
+                                    <div key={i} className={`mini-num-v3 ${isMarked ? 'marked' : ''}`}>
+                                        {num === 'FREE' ? <span className="free-star">✨</span> : num}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    ))}
+                </div>
+                <div className="card-footer-v3">Cartela No: {card.id}</div>
             </div>
-            <div className="card-footer-v3">Cartela No: {card.id}</div>
-        </div>
-    );
+        );
+    };
 
     return (
         <div className="game-view-v3 no-scroll-app">
@@ -236,7 +239,7 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                     onClick={() => {
                         if (!isAutomatic) {
                             selectedCartelas.forEach(card => {
-                                socket.emit('claim_win', { roomId, cartelaId: card.id });
+                                socket?.emit('claim_win', { roomId, cartelaId: card.id });
                             });
                         }
                     }}
@@ -245,10 +248,10 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                 </button>
             </footer>
 
-            {/* Winner Overlay - High Fidelity Restoration */}
+            {/* Winner Overlay - High Fidelity Restoration with Crash Protection */}
             {winner && (
                 <div className="bingo-modal-overlay">
-                    <div className="bingo-modal-content upscale-reveal gold-border-prestige">
+                    <div className="bingo-modal-content upscale-reveal-v4 gold-border-prestige">
                         <div className="crown-circle-v4">
                             <Trophy size={40} className="crown-svg-v4" />
                         </div>
@@ -256,40 +259,43 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                         <h1 className="bingo-title-v4">BINGO!</h1>
 
                         <div className="winners-list-v4">
-                            {(Array.isArray(winner) ? winner : [winner]).map((w, idx) => (
-                                <div key={idx} className="winner-presentation-v4">
-                                    <div className="winner-label-v4">
-                                        🎉 <span className="name-v4">{w.username} WON!</span> 🎉
-                                    </div>
-
-                                    <div className="card-box-v4">
-                                        <div className="card-header-v4">
-                                            <Trophy size={14} /> Winning Cartela : {w.cartelaId}
+                            {(Array.isArray(winner) ? winner : [winner]).map((w, idx) => {
+                                if (!w) return null;
+                                return (
+                                    <div key={idx} className="winner-presentation-v4">
+                                        <div className="winner-label-v4">
+                                            🎉 <span className="name-v4">{w.username || 'Player'} WON!</span> 🎉
                                         </div>
-                                        <div className="grid-5x5-v4">
-                                            {['B', 'I', 'N', 'G', 'O'].map((col, cIdx) => (
-                                                <div key={col} className="col-v4">
-                                                    <div className="header-v4" style={{ backgroundColor: getBallColor(cIdx * 15 + 1) }}>{col}</div>
-                                                    {w.officialCard?.numbers[col].map((num, i) => {
-                                                        const isMarked = gameState.calledNumbers.includes(num) || num === 'FREE';
-                                                        return (
-                                                            <div key={i} className={`cell-v4 ${isMarked ? 'marked' : ''}`}>
-                                                                {num === 'FREE' ? '✨' : num}
-                                                            </div>
-                                                        );
-                                                    })}
-                                                </div>
-                                            ))}
+
+                                        <div className="card-box-v4">
+                                            <div className="card-header-v4">
+                                                <Trophy size={14} /> Winning Cartela : {w.cartelaId || '...'}
+                                            </div>
+                                            <div className="grid-5x5-v4">
+                                                {['B', 'I', 'N', 'G', 'O'].map((col, cIdx) => (
+                                                    <div key={col} className="col-v4">
+                                                        <div className="header-v4" style={{ backgroundColor: getBallColor(cIdx * 15 + 1) }}>{col}</div>
+                                                        {(w.officialCard?.[col] || []).map((num, i) => {
+                                                            const isMarked = gameState.calledNumbers.includes(num) || num === 'FREE';
+                                                            return (
+                                                                <div key={i} className={`cell-v4 ${isMarked ? 'marked' : ''}`}>
+                                                                    {num === 'FREE' ? '✨' : num}
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div className="prize-pill-v4">
-                                        <span className="p-lbl">PRIZE:</span> {w.prize} <small>Birr</small>
-                                    </div>
+                                        <div className="prize-pill-v4">
+                                            <span className="p-lbl">PRIZE:</span> {w.prize || 0} <small>Birr</small>
+                                        </div>
 
-                                    {idx < (Array.isArray(winner) ? winner.length : 1) - 1 && <div className="winner-sep-v4" />}
-                                </div>
-                            ))}
+                                        {idx < (Array.isArray(winner) ? winner.length : 1) - 1 && <div className="winner-sep-v4" />}
+                                    </div>
+                                );
+                            })}
                         </div>
 
                         <div className="auto-start-pill-v4">

@@ -4183,3 +4183,39 @@ input:checked+.slider-v3:before {
   box-shadow: 0 5px 15px rgba(245, 158, 11, 0.3);
 }
 
+
+
+/* Final Hardened Winner Modal V4 Styles */
+.bingo-modal-overlay {
+  z-index: 9999 !important; /* Force to top */
+  background: rgba(10, 10, 20, 0.98) !important; /* Slightly darker/premium */
+}
+
+.bingo-modal-content.gold-border-prestige {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  min-height: 300px;
+  width: 95% !important;
+  max-width: 460px !important;
+  opacity: 1 !important; /* Ensure visibility */
+  transform: scale(1) !important;
+}
+
+.winner-presentation-v4 {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.upscale-reveal-v4 {
+  animation: upscale-v4 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+}
+
+@keyframes upscale-v4 {
+  from { transform: scale(0.7); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
