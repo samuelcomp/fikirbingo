@@ -3,7 +3,6 @@ import { io } from 'socket.io-client';
 import { Trophy, LogOut, RotateCcw, Volume2, VolumeX, Info } from 'lucide-react';
 
 const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\s/g, '');
-// Socket is now initialized inside the component to include the auth token
 
 const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver, t }) => {
     const [gameState, setGameState] = useState({
@@ -11,7 +10,8 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
         playersCount: 0,
         prizePool: 0,
         calledNumbers: [],
-        status: 'PLAYING'
+        status: 'PLAYING',
+        resetIn: 0
     });
     const [winner, setWinner] = useState(null);
     const [isAutomatic, setIsAutomatic] = useState(true);
@@ -19,7 +19,6 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
     const [currentBall, setCurrentBall] = useState(null);
 
     const isWatcher = selectedCartelas.length === 0;
-
     const [socket, setSocket] = useState(null);
 
     useEffect(() => {
@@ -42,7 +41,8 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                     playersCount: data.playersCount || 0,
                     prizePool: data.prizePool || 0,
                     calledNumbers: data.calledNumbers || [],
-                    status: data.status
+                    status: data.status,
+                    resetIn: data.resetIn || 0
                 }));
                 if (data.calledNumbers?.length > 0) {
                     setCurrentBall(data.calledNumbers[data.calledNumbers.length - 1]);
@@ -68,16 +68,18 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                     gameId: data.gameId,
                     status: data.status,
                     playersCount: data.playersCount,
-                    prizePool: data.prizePool
+                    prizePool: data.prizePool,
+                    resetIn: data.resetIn || 0
                 }));
                 if (data.winnerData) {
+                    console.log('📢 Winner data received via TICK:', data.winnerData);
                     setWinner(data.winnerData);
                 }
             }
         });
 
         s.on('player_won', (data) => {
-            console.log('🏆 Player won event received:', data);
+            console.log('🏆 Winner data received via EVENT:', data);
             setWinner(data);
         });
 
@@ -87,7 +89,7 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
         });
 
         return () => {
-            s.disconnect();
+            if (s) s.disconnect();
         };
     }, [roomId, user?.id, onGameOver]);
 
@@ -108,7 +110,7 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
     };
 
     const renderCard = (card) => (
-        <div key={card.id} className="game-card-v3">
+        <div key={card.id} className="game-card-v3 upscale-reveal">
             <div className="bingo-grid-5x5-v3">
                 {['B', 'I', 'N', 'G', 'O'].map((col, idx) => (
                     <div key={col} className="bingo-col-v3">
@@ -130,7 +132,6 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
 
     return (
         <div className="game-view-v3 no-scroll-app">
-            {/* 5-Pill Header */}
             <header className="game-status-row-v3">
                 <div className="stat-pill-v3">
                     <span className="pill-title">Game ID</span>
@@ -155,7 +156,6 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
             </header>
 
             <div className="game-body-v3">
-                {/* 1-75 Vertical Sidebar (BINGO Columns) */}
                 <aside className="bingo-sidebar-v3">
                     {['B', 'I', 'N', 'G', 'O'].map((letter, colIndex) => (
                         <div key={letter} className="sidebar-col-v3">
@@ -173,7 +173,6 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                     ))}
                 </aside>
 
-                {/* Right Area: Control & Feedback */}
                 <main className="game-main-v3">
                     <div className="top-feedback-v3">
                         <div className="recent-draws-v3">
@@ -228,20 +227,14 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                 </main>
             </div>
 
-            {/* Bottom Actions */}
             <footer className="game-footer-v3">
-                <button className="action-btn-v3 leave" onClick={() => onGameOver()}>
-                    Leave
-                </button>
-                <button className="action-btn-v3 refresh" onClick={() => window.location.reload()}>
-                    Refresh
-                </button>
+                <button className="action-btn-v3 leave" onClick={() => onGameOver()}>Leave</button>
+                <button className="action-btn-v3 refresh" onClick={() => window.location.reload()}>Refresh</button>
                 <button
                     className={`action-btn-v3 automatic ${isAutomatic ? 'active' : 'claim'}`}
                     disabled={isWatcher}
                     onClick={() => {
                         if (!isAutomatic) {
-                            // Find any winning cartela and claim
                             selectedCartelas.forEach(card => {
                                 socket.emit('claim_win', { roomId, cartelaId: card.id });
                             });
@@ -252,44 +245,35 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                 </button>
             </footer>
 
-            {/* Winner Overlay */}
+            {/* Winner Overlay - High Fidelity Restoration */}
             {winner && (
                 <div className="bingo-modal-overlay">
-                    <div className="bingo-modal-content upscale-reveal gold-border">
-                        <div className="crown-icon-wrapper">
-                            <Trophy size={80} className="floating-crown" />
+                    <div className="bingo-modal-content upscale-reveal gold-border-prestige">
+                        <div className="crown-circle-v4">
+                            <Trophy size={40} className="crown-svg-v4" />
                         </div>
-                        <h1 className="bingo-title glow-text">
-                            {Array.isArray(winner) && winner.length > 1 ? `${winner.length} BINGOS!` : 'BINGO!'}
-                        </h1>
 
-                        <div className="winners-list-container">
+                        <h1 className="bingo-title-v4">BINGO!</h1>
+
+                        <div className="winners-list-v4">
                             {(Array.isArray(winner) ? winner : [winner]).map((w, idx) => (
-                                <div key={idx} className="winner-record-v2">
-                                    <div className="winner-announcement">
-                                        <span className="party-emoji">🎉</span>
-                                        <div className="winner-details">
-                                            <span className="winner-name">{w.username} WON!</span>
-                                            {w.phoneNumber && <span className="winner-phone">{w.phoneNumber}</span>}
+                                <div key={idx} className="winner-presentation-v4">
+                                    <div className="winner-label-v4">
+                                        🎉 <span className="name-v4">{w.username} WON!</span> 🎉
+                                    </div>
+
+                                    <div className="card-box-v4">
+                                        <div className="card-header-v4">
+                                            <Trophy size={14} /> Winning Cartela : {w.cartelaId}
                                         </div>
-                                        <span className="party-emoji">🎉</span>
-                                    </div>
-
-                                    <div className="prize-sum-v2">
-                                        <div className="prize-label">PRIZE</div>
-                                        <div className="prize-val-v2">{w.prize} <small>Birr</small></div>
-                                    </div>
-
-                                    <div className="winning-card-preview small">
-                                        <div className="preview-label">🏆 Cartela : {w.cartelaId}</div>
-                                        <div className="bingo-grid-5x5 mini">
-                                            {['B', 'I', 'N', 'G', 'O'].map(col => (
-                                                <div key={col} className="bingo-column">
-                                                    <div className="col-header" style={{ color: getBallColor(['B', 'I', 'N', 'G', 'O'].indexOf(col) * 15 + 1) }}>{col}</div>
+                                        <div className="grid-5x5-v4">
+                                            {['B', 'I', 'N', 'G', 'O'].map((col, cIdx) => (
+                                                <div key={col} className="col-v4">
+                                                    <div className="header-v4" style={{ backgroundColor: getBallColor(cIdx * 15 + 1) }}>{col}</div>
                                                     {w.officialCard?.numbers[col].map((num, i) => {
                                                         const isMarked = gameState.calledNumbers.includes(num) || num === 'FREE';
                                                         return (
-                                                            <div key={i} className={`mini-num ${isMarked ? 'marked' : ''}`}>
+                                                            <div key={i} className={`cell-v4 ${isMarked ? 'marked' : ''}`}>
                                                                 {num === 'FREE' ? '✨' : num}
                                                             </div>
                                                         );
@@ -298,17 +282,22 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                                             ))}
                                         </div>
                                     </div>
-                                    {idx < (Array.isArray(winner) ? winner.length : 1) - 1 && <hr className="winner-divider" />}
+
+                                    <div className="prize-pill-v4">
+                                        <span className="p-lbl">PRIZE:</span> {w.prize} <small>Birr</small>
+                                    </div>
+
+                                    {idx < (Array.isArray(winner) ? winner.length : 1) - 1 && <div className="winner-sep-v4" />}
                                 </div>
                             ))}
                         </div>
 
-                        <div className="next-game-ticker">
-                            <div className="ticker-dot"></div>
-                            Auto-starting next round...
+                        <div className="auto-start-pill-v4">
+                            <div className="dot-v4 pulsing"></div>
+                            Auto-starting next game in {gameState.resetIn || 0}s
                         </div>
 
-                        <button className="continue-btn prestige-action" onClick={() => onGameOver()}>
+                        <button className="prestige-continue-btn" onClick={() => onGameOver()}>
                             CONTINUE
                         </button>
                     </div>
