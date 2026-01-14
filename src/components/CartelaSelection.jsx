@@ -1,6 +1,44 @@
 import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
-import { ChevronLeft, RotateCcw, MonitorPlay, Check, Loader2 } from 'lucide-react';
+import { ChevronLeft, RotateCcw, MonitorPlay, Check, Loader2, AlertCircle } from 'lucide-react';
+
+const CartelaChip = React.memo(({ id, isMine, isOther, onClick }) => {
+    return (
+        <div
+            className={`cartela-chip-v3 ${isMine ? 'mine' : ''} ${isOther ? 'other' : ''}`}
+            onClick={() => onClick(id)}
+        >
+            {id}
+            {isMine && <Check size={10} className="chip-check" />}
+            {isOther && <div className="chip-indicator" />}
+        </div>
+    );
+});
+
+const BalanceModal = ({ isOpen, onClose, t }) => {
+    if (!isOpen) return null;
+    return (
+        <div className="balance-overlay upscale-reveal" onClick={onClose}>
+            <div className="balance-modal" onClick={e => e.stopPropagation()}>
+                <div className="modal-icon-glow">
+                    <AlertCircle size={32} color="#f87171" />
+                </div>
+                <h3>Insufficient Balance!</h3>
+                <p className="amharic-text">ለጨዋታው በቂ ቀሪ ሂሳብ የለዎትም።</p>
+                <p className="english-text">You don't have enough balance to play the game.</p>
+
+                <div className="modal-actions">
+                    <button className="deposit-redirect-btn" onClick={() => window.location.href = '/wallet'}>
+                        Deposit Now 💳
+                    </button>
+                    <button className="close-modal-btn" onClick={onClose}>
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\s/g, '');
 
@@ -10,8 +48,10 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
     const [takenCartelas, setTakenCartelas] = useState({});
     const [playersCount, setPlayersCount] = useState(0);
     const [prizePool, setPrizePool] = useState(0);
-    const [countdown, setCountdown] = useState(60);
     const [roomStatus, setRoomStatus] = useState('WAITING');
+    const [displayCountdown, setDisplayCountdown] = useState(60);
+    const [selectionError, setSelectionError] = useState(null);
+    const [isBalanceModalOpen, setIsBalanceModalOpen] = useState(false);
     const roomId = `room-${stake}`;
 
     useEffect(() => {
@@ -30,6 +70,7 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
         s.on('room_state', (data) => {
             if (data.roomId === roomId) {
                 setCountdown(data.countdown);
+                setDisplayCountdown(data.countdown); // Sync local display
                 setRoomStatus(data.status);
                 setTakenCartelas(data.takenCartelas || {});
                 setPlayersCount(data.playersCount || 0);
@@ -44,6 +85,11 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
         s.on('room_tick', (data) => {
             if (data.roomId === roomId) {
                 setCountdown(data.countdown);
+                // Only sync local display if it's more than 2 seconds off or if it's a reset
+                setDisplayCountdown(prev => {
+                    if (Math.abs(prev - data.countdown) > 2) return data.countdown;
+                    return prev;
+                });
                 setRoomStatus(data.status);
                 setPlayersCount(data.playersCount || 0);
                 setPrizePool(data.prizePool || 0);
@@ -54,10 +100,26 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
             }
         });
 
+        s.on('error', (msg) => {
+            setSelectionError(msg);
+            setTimeout(() => setSelectionError(null), 3000);
+        });
+
         return () => {
             s.disconnect();
         };
     }, [roomId, user?.telegramId]);
+
+    // Local Timer Interpolation
+    useEffect(() => {
+        if (roomStatus !== 'WAITING') return;
+
+        const timer = setInterval(() => {
+            setDisplayCountdown(prev => (prev > 0 ? prev - 1 : 0));
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, [roomStatus]);
 
     // Auto-transition to Game/Spectator when status is PLAYING
     useEffect(() => {
@@ -97,15 +159,31 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
     const toggleCartela = (id) => {
         if (roomStatus !== 'WAITING' || !socket) return;
 
+        // Security/Balance check
+        const totalSelected = selectedIds.length;
+        const isDeselect = selectedIds.includes(id);
+
+        if (!isDeselect) {
+            // Check play balance vs stake
+            const balance = user?.playBalance || 0;
+            if (balance < stake) {
+                setIsBalanceModalOpen(true);
+                return;
+            }
+        }
+
         const allTaken = Object.entries(takenCartelas)
             .filter(([tid]) => tid !== user?.telegramId)
             .flatMap(([_, ids]) => ids);
 
         if (allTaken.includes(id)) return;
 
-        if (selectedIds.includes(id)) {
+        // Optimistic UI Update
+        if (isDeselect) {
+            setSelectedIds(prev => prev.filter(item => item !== id));
             socket.emit('deselect_cartela', { roomId, cartelaId: id });
         } else if (selectedIds.length < 2) {
+            setSelectedIds(prev => [...prev, id]);
             socket.emit('select_cartela', { roomId, cartelaId: id });
         }
     };
@@ -177,9 +255,16 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
                     <span className="box-value">{stake}</span>
                 </div>
                 <div className="status-box highlight">
-                    <span className="box-value">{countdown} s</span>
+                    <span className="box-value">{displayCountdown} s</span>
                 </div>
             </div>
+
+            {selectionError && (
+                <div className="selection-error-banner upscale-reveal">
+                    <AlertCircle size={16} />
+                    <span>{selectionError}</span>
+                </div>
+            )}
 
             <div className="selection-progress-bar">
                 <div className="progress-info">
@@ -195,21 +280,15 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
 
             <main className="lobby-main-grid-area">
                 <div className="cartela-chips-scroll">
-                    {Array.from({ length: 400 }, (_, i) => i + 1).map(id => {
-                        const isMine = selectedIds.includes(id);
-                        const isOther = isTakenByOther(id);
-                        return (
-                            <div
-                                key={id}
-                                className={`cartela-chip-v3 ${isMine ? 'mine' : ''} ${isOther ? 'other' : ''}`}
-                                onClick={() => toggleCartela(id)}
-                            >
-                                {id}
-                                {isMine && <Check size={10} className="chip-check" />}
-                                {isOther && <div className="chip-indicator" />}
-                            </div>
-                        );
-                    })}
+                    {Array.from({ length: 400 }, (_, i) => i + 1).map(id => (
+                        <CartelaChip
+                            key={id}
+                            id={id}
+                            isMine={selectedIds.includes(id)}
+                            isOther={isTakenByOther(id)}
+                            onClick={toggleCartela}
+                        />
+                    ))}
                 </div>
             </main>
 
@@ -240,6 +319,12 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
                     </div>
                 )}
             </footer>
+
+            <BalanceModal
+                isOpen={isBalanceModalOpen}
+                onClose={() => setIsBalanceModalOpen(false)}
+                t={t}
+            />
         </div>
     );
 };
