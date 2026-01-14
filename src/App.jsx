@@ -158,7 +158,7 @@ function App() {
                     />
                 )}
 
-                {view !== 'register' && (
+                {!mustRegister && view !== 'register' && (
                     <>
                         {view === 'landing' && (
                             <LandingPage
@@ -209,6 +209,18 @@ function App() {
                         )}
                     </>
                 )}
+
+                {mustRegister && view !== 'register' && (
+                    <div className="registration-gate upscale-reveal">
+                        <div className="gate-content">
+                            <h2>🛡️ Registration Required</h2>
+                            <p>You must complete your registration before accessing the game. This ensures a secure and fair experience for all players.</p>
+                            <button className="prestige-btn" onClick={() => setView('register')}>
+                                Go to Registration
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {view !== 'game' && (
@@ -227,16 +239,6 @@ function App() {
                             <button className="nav-item" onClick={() => alert('Support: @FikirBingoSupport')}>
                                 <Phone size={22} />
                                 <span>SUPPORT</span>
-                            </button>
-                            <button className="nav-item" onClick={() => {
-                                setView('landing');
-                                setTimeout(() => {
-                                    const rulesBtn = document.querySelector('.rules-btn');
-                                    if (rulesBtn) rulesBtn.click();
-                                }, 100);
-                            }}>
-                                <HelpCircle size={22} />
-                                <span>RULES</span>
                             </button>
                         </>
                     ) : (
