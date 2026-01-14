@@ -61,6 +61,15 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
         };
     }, [roomId, user?.id]);
 
+    // Auto-transition to Game/Spectator when status is PLAYING
+    useEffect(() => {
+        if (roomStatus === 'PLAYING') {
+            console.log('[Lobby] Game started! Auto-transitioning...');
+            const cards = selectedIds.map(id => generateDeterministicCard(id));
+            onGameStart(cards);
+        }
+    }, [roomStatus, selectedIds, onGameStart]);
+
     const generateDeterministicCard = (id) => {
         const getNumbers = (cardId, offset, min, max, count) => {
             const pool = [];
@@ -167,6 +176,10 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
                 </div>
                 <div className="stat-pill-v2 timer-pill">
                     <span className="pill-val">{countdown} <small>s</small></span>
+                </div>
+                <div className={`stat-pill-v2 selection-pill ${selectedIds.length === 2 ? 'full' : ''}`}>
+                    <span className="pill-title">Cards</span>
+                    <span className="pill-val">{selectedIds.length}/2</span>
                 </div>
             </div>
 
