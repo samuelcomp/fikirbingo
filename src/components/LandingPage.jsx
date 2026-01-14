@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Play, Trophy, Users, History, Wallet, HelpCircle, CheckCircle2 } from 'lucide-react';
 import { logoBase64 } from '../assets/logo';
 
-const LandingPage = ({ onPlay, appName, appLogo, t, userBalance = 0 }) => {
+const LandingPage = ({ onPlay, appName, appLogo, t, userBalance = 0, mustRegister = false }) => {
     const [showRules, setShowRules] = useState(false);
     const [selectedStake, setSelectedStake] = useState(10);
 
@@ -45,10 +45,12 @@ const LandingPage = ({ onPlay, appName, appLogo, t, userBalance = 0 }) => {
                     <div className="stake-card premium-card animate-reveal delay-3">
                         <div className="stake-header">
                             <span className="available-stakes-label">Available Stakes (መጠኖች)</span>
-                            <div className="wallet-pill gold-glow">
-                                <Wallet size={12} className="wallet-icon-mini" />
-                                {userBalance} Birr
-                            </div>
+                            {!mustRegister && (
+                                <div className="wallet-pill gold-glow">
+                                    <Wallet size={12} className="wallet-icon-mini" />
+                                    {userBalance} Birr
+                                </div>
+                            )}
                         </div>
 
                         <div className="stake-options">

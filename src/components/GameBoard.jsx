@@ -3,11 +3,7 @@ import { io } from 'socket.io-client';
 import { Trophy, LogOut, RotateCcw, Volume2, VolumeX, Info } from 'lucide-react';
 
 const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\s/g, '');
-const socket = io(API_URL, {
-    extraHeaders: {
-        "ngrok-skip-browser-warning": "true"
-    }
-});
+// Socket is now initialized inside the component to include the auth token
 
 const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver, t }) => {
     const [gameState, setGameState] = useState({
@@ -24,12 +20,21 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
 
     const isWatcher = selectedCartelas.length === 0;
 
-    useEffect(() => {
-        if (!user?.id) return;
-        const userId = user.id;
-        socket.emit('join_room', { roomId, userId });
+    const [socket, setSocket] = useState(null);
 
-        socket.on('room_state', (data) => {
+    useEffect(() => {
+        const token = localStorage.getItem('userToken');
+        if (!token || !user?.id) return;
+
+        const s = io(API_URL, {
+            auth: { token },
+            extraHeaders: { "ngrok-skip-browser-warning": "true" }
+        });
+        setSocket(s);
+
+        s.emit('join_room', { roomId });
+
+        s.on('room_state', (data) => {
             if (data.roomId === roomId) {
                 setGameState(prev => ({
                     ...prev,
@@ -48,7 +53,7 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
             }
         });
 
-        socket.on('ball_drawn', (data) => {
+        s.on('ball_drawn', (data) => {
             setCurrentBall(data.ball);
             setGameState(prev => ({
                 ...prev,
@@ -56,7 +61,7 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
             }));
         });
 
-        socket.on('room_tick', (data) => {
+        s.on('room_tick', (data) => {
             if (data.roomId === roomId) {
                 setGameState(prev => ({
                     ...prev,
@@ -71,22 +76,18 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
             }
         });
 
-        socket.on('player_won', (data) => {
+        s.on('player_won', (data) => {
             console.log('🏆 Player won event received:', data);
             setWinner(data);
         });
 
-        socket.on('game_reset', () => {
+        s.on('game_reset', () => {
             console.log('🔄 Game reset event received');
             onGameOver();
         });
 
         return () => {
-            socket.off('room_state');
-            socket.off('ball_drawn');
-            socket.off('room_tick');
-            socket.off('player_won');
-            socket.off('game_reset');
+            s.disconnect();
         };
     }, [roomId, user?.id, onGameOver]);
 
@@ -238,6 +239,14 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                 <button
                     className={`action-btn-v3 automatic ${isAutomatic ? 'active' : 'claim'}`}
                     disabled={isWatcher}
+                    onClick={() => {
+                        if (!isAutomatic) {
+                            // Find any winning cartela and claim
+                            selectedCartelas.forEach(card => {
+                                socket.emit('claim_win', { roomId, cartelaId: card.id });
+                            });
+                        }
+                    }}
                 >
                     {isAutomatic ? 'Automatic' : 'CLAIM BINGO!'}
                 </button>

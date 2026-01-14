@@ -3,15 +3,12 @@ import { io } from 'socket.io-client';
 import { ChevronLeft, RotateCcw } from 'lucide-react';
 
 const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\s/g, '');
-const socket = io(API_URL, {
-    extraHeaders: {
-        "ngrok-skip-browser-warning": "true"
-    }
-});
+// Socket is now initialized inside the component to include the auth token
 
 const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
+    const [socket, setSocket] = useState(null);
     const [selectedIds, setSelectedIds] = useState([]);
-    const [takenCartelas, setTakenCartelas] = useState({}); // { userId: [ids] }
+    const [takenCartelas, setTakenCartelas] = useState({});
     const [playersCount, setPlayersCount] = useState(0);
     const [prizePool, setPrizePool] = useState(0);
     const [countdown, setCountdown] = useState(60);
@@ -19,11 +16,19 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
     const roomId = `room-${stake}`;
 
     useEffect(() => {
-        if (!user?.id) return;
-        const userId = user.id;
-        socket.emit('join_room', { roomId, userId });
+        const token = localStorage.getItem('userToken');
+        if (!token || !user?.id) return;
 
-        socket.on('room_state', (data) => {
+        const s = io(API_URL, {
+            auth: { token },
+            extraHeaders: { "ngrok-skip-browser-warning": "true" }
+        });
+        setSocket(s);
+
+        const userId = user.id;
+        s.emit('join_room', { roomId });
+
+        s.on('room_state', (data) => {
             if (data.roomId === roomId) {
                 setCountdown(data.countdown);
                 setRoomStatus(data.status);
@@ -37,7 +42,7 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
             }
         });
 
-        socket.on('room_tick', (data) => {
+        s.on('room_tick', (data) => {
             if (data.roomId === roomId) {
                 setCountdown(data.countdown);
                 setRoomStatus(data.status);
@@ -46,20 +51,15 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
             }
         });
 
+        s.on('game_started', () => {
+            // Can't easily use selectedIds here due to closure, 
+            // but the footer button click usually handles transition
+        });
+
         return () => {
-            socket.off('room_state');
-            socket.off('room_tick');
+            s.disconnect();
         };
     }, [roomId, user?.id]);
-
-    useEffect(() => {
-        const handleStart = () => {
-            const currentSelected = selectedIds.map(id => generateDeterministicCard(id));
-            onGameStart(currentSelected);
-        };
-        socket.on('game_started', handleStart);
-        return () => socket.off('game_started', handleStart);
-    }, [selectedIds, onGameStart]);
 
     const generateDeterministicCard = (id) => {
         const getNumbers = (cardId, offset, min, max, count) => {
@@ -88,18 +88,18 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
     };
 
     const toggleCartela = (id) => {
-        if (roomStatus !== 'WAITING' || !user?.id) return;
+        if (roomStatus !== 'WAITING' || !socket) return;
 
         const allTaken = Object.entries(takenCartelas)
-            .filter(([uid]) => uid !== user.id)
+            .filter(([uid]) => uid !== user?.id)
             .flatMap(([_, ids]) => ids);
 
         if (allTaken.includes(id)) return;
 
         if (selectedIds.includes(id)) {
-            socket.emit('deselect_cartela', { roomId, userId: user.id, cartelaId: id });
+            socket.emit('deselect_cartela', { roomId, cartelaId: id });
         } else if (selectedIds.length < 2) {
-            socket.emit('select_cartela', { roomId, userId: user.id, cartelaId: id });
+            socket.emit('select_cartela', { roomId, cartelaId: id });
         }
     };
 

@@ -78,22 +78,6 @@ function App() {
                 if (res.data.phoneNumber) {
                     setMustRegister(false);
                 }
-            } else if (!window.Telegram?.WebApp?.initData) {
-                // Only use dev fallback if definitely NOT in Telegram
-                let devId = sessionStorage.getItem('devOrderId');
-                if (!devId) {
-                    devId = 'dev-' + Math.random().toString(36).substring(7);
-                    sessionStorage.setItem('devOrderId', devId);
-                }
-                setUser({
-                    id: devId,
-                    username: 'Player-' + devId.substring(4).toUpperCase(),
-                    phoneNumber: '0900000000',
-                    playBalance: 1250,
-                    mainBalance: 50,
-                    totalWins: 0,
-                    coins: 0
-                });
             }
         } catch (e) {
             console.error('Profile fetch failed');
@@ -138,19 +122,43 @@ function App() {
         );
     }
 
+    const isNotTelegram = !window.Telegram?.WebApp?.initData &&
+        !window.location.hostname.includes('localhost') &&
+        !window.location.hostname.includes('127.0.0.1');
+
+    if (isNotTelegram) {
+        return (
+            <div className="access-denied-screen">
+                <div className="denied-card upscale-reveal">
+                    <h1>🚷 Access Denied</h1>
+                    <p>ይህ ጨዋታ ሊደረስበት የሚችለው በቴሌግራም ቦት ብቻ ነው (This game is only accessible via Telegram Bot).</p>
+                    <div className="qr-placeholder">
+                        <div className="bot-link">@FikirRealBingoBot</div>
+                    </div>
+                    <button className="prestige-btn" onClick={() => window.location.href = 'https://t.me/FikirRealBingoBot'}>
+                        Go to Bot
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="app-main">
             <div className="content-area">
-                {mustRegister ? (
+                {view === 'register' && (
                     <RegisterPage
                         API_URL={API_URL}
                         t={t}
                         onRegisterSuccess={() => {
                             setMustRegister(false);
+                            setView('landing');
                             initApp();
                         }}
                     />
-                ) : (
+                )}
+
+                {view !== 'register' && (
                     <>
                         {view === 'landing' && (
                             <LandingPage
@@ -159,6 +167,7 @@ function App() {
                                 appLogo={branding.appLogo}
                                 userBalance={user?.playBalance || 0}
                                 t={t}
+                                mustRegister={mustRegister}
                             />
                         )}
                         {view === 'leaderboard' && (
@@ -202,37 +211,50 @@ function App() {
                 )}
             </div>
 
-            {!mustRegister && view !== 'game' && (
+            {view !== 'game' && (
                 <nav className="bottom-nav">
                     <button className={`nav-item ${view === 'landing' ? 'active' : ''}`} onClick={() => setView('landing')}>
                         <Home size={22} />
-                        <span>LOBBY</span>
+                        <span>HOME</span>
                     </button>
-                    <button className={`nav-item ${view === 'leaderboard' ? 'active' : ''}`} onClick={() => {
-                        if (mustRegister) alert(t.mustRegisterError);
-                        else setView('leaderboard');
-                    }}>
-                        <TrophyIcon size={22} />
-                        <span>RANKING</span>
-                    </button>
-                    <button className={`nav-item ${view === 'lobby' ? 'active' : ''}`} onClick={() => setView('landing')}>
-                        <Gamepad2 size={22} />
-                        <span>GAMES</span>
-                    </button>
-                    <button className={`nav-item ${view === 'wallet' ? 'active' : ''}`} onClick={() => {
-                        if (mustRegister) alert(t.mustRegisterError);
-                        else setView('wallet');
-                    }}>
-                        <Wallet size={22} />
-                        <span>{t.wallet || 'WALLET'}</span>
-                    </button>
-                    <button className={`nav-item ${view === 'profile' ? 'active' : ''}`} onClick={() => {
-                        if (mustRegister) alert(t.mustRegisterError);
-                        else setView('profile');
-                    }}>
-                        <UserIcon size={22} />
-                        <span>{t.profile || 'ME'}</span>
-                    </button>
+
+                    {mustRegister ? (
+                        <>
+                            <button className={`nav-item ${view === 'register' ? 'active' : ''}`} onClick={() => setView('register')}>
+                                <UserIcon size={22} />
+                                <span>REGISTER</span>
+                            </button>
+                            <button className="nav-item" onClick={() => alert('Support: @FikirBingoSupport')}>
+                                <Phone size={22} />
+                                <span>SUPPORT</span>
+                            </button>
+                            <button className="nav-item" onClick={() => {
+                                setView('landing');
+                                setTimeout(() => {
+                                    const rulesBtn = document.querySelector('.rules-btn');
+                                    if (rulesBtn) rulesBtn.click();
+                                }, 100);
+                            }}>
+                                <HelpCircle size={22} />
+                                <span>RULES</span>
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            <button className={`nav-item ${view === 'leaderboard' ? 'active' : ''}`} onClick={() => setView('leaderboard')}>
+                                <TrophyIcon size={22} />
+                                <span>RANKING</span>
+                            </button>
+                            <button className={`nav-item ${view === 'wallet' ? 'active' : ''}`} onClick={() => setView('wallet')}>
+                                <Wallet size={22} />
+                                <span>{t.wallet || 'WALLET'}</span>
+                            </button>
+                            <button className={`nav-item ${view === 'profile' ? 'active' : ''}`} onClick={() => setView('profile')}>
+                                <UserIcon size={22} />
+                                <span>{t.profile || 'ME'}</span>
+                            </button>
+                        </>
+                    )}
                 </nav>
             )}
         </div>
