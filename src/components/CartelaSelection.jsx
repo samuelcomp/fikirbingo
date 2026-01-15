@@ -45,11 +45,11 @@ const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replac
 const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
     const [socket, setSocket] = useState(null);
     const [selectedIds, setSelectedIds] = useState([]);
-    const [takenCartelas, setTakenCartelas] = useState({});
+    const [takenCartelas, setTakenCartelas] = useState({}); // Now maps id -> true
     const [playersCount, setPlayersCount] = useState(0);
     const [prizePool, setPrizePool] = useState(0);
     const [roomStatus, setRoomStatus] = useState('WAITING');
-    const [displayCountdown, setDisplayCountdown] = useState(60);
+    const [displayCountdown, setDisplayCountdown] = useState(null); // Null to avoid 60s flash
     const [selectionError, setSelectionError] = useState(null);
     const [isBalanceModalOpen, setIsBalanceModalOpen] = useState(false);
     const roomId = `room-${stake}`;
@@ -64,27 +64,30 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
         });
         setSocket(s);
 
-        const telegramId = user.telegramId;
         s.emit('join_room', { roomId });
 
         s.on('room_state', (data) => {
             if (data.roomId === roomId) {
-                setDisplayCountdown(data.countdown); // Immediate sync on re-entry
+                setDisplayCountdown(data.countdown);
                 setRoomStatus(data.status);
-                setTakenCartelas(data.takenCartelas || {});
+                if (data.takenIds) {
+                    const mapped = {};
+                    data.takenIds.forEach(id => mapped[id] = true);
+                    setTakenCartelas(mapped);
+                }
                 setPlayersCount(data.playersCount || 0);
                 setPrizePool(data.prizePool || 0);
 
-                // Sync our selection with server using telegramId
-                const myTaken = data.takenCartelas?.[telegramId] || [];
-                setSelectedIds(myTaken);
+                if (data.mySelections) {
+                    setSelectedIds(data.mySelections);
+                }
             }
         });
 
         s.on('room_tick', (data) => {
             if (data.roomId === roomId) {
-                // Only sync local display if it's more than 2 seconds off or if it's a reset
                 setDisplayCountdown(prev => {
+                    if (prev === null) return data.countdown;
                     if (Math.abs(prev - data.countdown) > 2) return data.countdown;
                     return prev;
                 });
@@ -92,23 +95,16 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
                 setPlayersCount(data.playersCount || 0);
                 setPrizePool(data.prizePool || 0);
 
+                if (data.takenIds) {
+                    const mapped = {};
+                    data.takenIds.forEach(id => mapped[id] = true);
+                    setTakenCartelas(mapped);
+                }
+
                 if (data.status === 'PLAYING') {
                     setRoomStatus('PLAYING');
                 }
             }
-        });
-
-        s.on('user_update', (updatedUser) => {
-            console.log('[Socket] User balance updated');
-            // This event is handled by the parent (App.jsx) in some designs, 
-            // but here we can try to update local state or let it propagate.
-            // Since `user` is a prop, we need a callback to update it in App.jsx.
-            if (onUpdateUser) onUpdateUser(updatedUser);
-        });
-
-        s.on('error', (msg) => {
-            setSelectionError(msg);
-            setTimeout(() => setSelectionError(null), 3000);
         });
 
         return () => {
@@ -116,18 +112,16 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
         };
     }, [roomId, user?.telegramId]);
 
-    // Local Timer Interpolation
     useEffect(() => {
         if (roomStatus !== 'WAITING') return;
 
         const timer = setInterval(() => {
-            setDisplayCountdown(prev => (prev > 0 ? prev - 1 : 0));
+            setDisplayCountdown(prev => (prev !== null && prev > 0 ? prev - 1 : prev));
         }, 1000);
 
         return () => clearInterval(timer);
     }, [roomStatus]);
 
-    // Auto-transition to Game/Spectator when status is PLAYING
     useEffect(() => {
         if (roomStatus === 'PLAYING') {
             console.log('[Lobby] Game started! Auto-transitioning...');
@@ -148,46 +142,33 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
             return result.sort((a, b) => a - b);
         };
 
-        const card = {
+        return {
             id,
             numbers: {
-                B: getNumbers(id, 1, 1, 15, 5),
-                I: getNumbers(id, 2, 16, 30, 5),
-                N: getNumbers(id, 3, 31, 45, 5),
-                G: getNumbers(id, 4, 46, 60, 5),
-                O: getNumbers(id, 5, 61, 75, 5)
+                B: getNumbers(id, 0, 1, 15, 5),
+                I: getNumbers(id, 1, 16, 30, 5),
+                N: getNumbers(id, 2, 31, 45, 5).map((n, i) => i === 2 ? 'FREE' : n),
+                G: getNumbers(id, 3, 46, 60, 5),
+                O: getNumbers(id, 4, 61, 75, 5)
             }
         };
-        card.numbers.N[2] = 'FREE';
-        return card;
     };
 
     const toggleCartela = (id) => {
-        if (roomStatus !== 'WAITING' || !socket) return;
-
-        // Security/Balance check
-        const totalSelected = selectedIds.length;
+        if (roomStatus !== 'WAITING') return;
         const isDeselect = selectedIds.includes(id);
 
         if (!isDeselect) {
-            // Check combined balance (Play + Main)
-            const playBal = Number(user?.playBalance || 0);
-            const mainBal = Number(user?.mainBalance || 0);
-            const totalAvailable = playBal + mainBal;
-
-            if (totalAvailable < stake) {
+            const cost = stake;
+            const currentBalance = (user.playBalance || 0) + (user.mainBalance || 0);
+            if (currentBalance < cost) {
                 setIsBalanceModalOpen(true);
                 return;
             }
         }
 
-        const allTaken = Object.entries(takenCartelas)
-            .filter(([tid]) => tid !== user?.telegramId)
-            .flatMap(([_, ids]) => ids);
+        if (takenCartelas[id] && !isDeselect) return;
 
-        if (allTaken.includes(id)) return;
-
-        // Optimistic UI Update
         if (isDeselect) {
             setSelectedIds(prev => prev.filter(item => item !== id));
             socket.emit('deselect_cartela', { roomId, cartelaId: id });
@@ -198,8 +179,7 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
     };
 
     const isTakenByOther = (id) => {
-        return Object.entries(takenCartelas)
-            .some(([tid, ids]) => tid !== user?.telegramId && ids.includes(id));
+        return takenCartelas[id] && !selectedIds.includes(id);
     };
 
     const getBallColor = (num) => {
@@ -244,6 +224,16 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
                     <ChevronLeft size={22} />
                     <span>Back</span>
                 </button>
+                <div className="header-stat-glass">
+                    <span className="stat-label">Time Remaining</span>
+                    <span className="stat-value timer">
+                        {displayCountdown === null ? (
+                            <Loader2 size={16} className="spinning" />
+                        ) : (
+                            `${displayCountdown}s`
+                        )}
+                    </span>
+                </div>
                 <button className="header-action-btn refresh" onClick={() => window.location.reload()}>
                     <RotateCcw size={18} />
                     <span>Refresh</span>
@@ -264,7 +254,8 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
                     <span className="box-value">{stake}</span>
                 </div>
                 <div className="status-box highlight">
-                    <span className="box-value">{displayCountdown} s</span>
+                    <span className="box-label">Prize Pool</span>
+                    <span className="box-value">{prizePool} <small>Birr</small></span>
                 </div>
             </div>
 
