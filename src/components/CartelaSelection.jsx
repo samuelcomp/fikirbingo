@@ -52,6 +52,7 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
     const [displayCountdown, setDisplayCountdown] = useState(null); // Null to avoid 60s flash
     const [selectionError, setSelectionError] = useState(null);
     const [isBalanceModalOpen, setIsBalanceModalOpen] = useState(false);
+    const [processingId, setProcessingId] = useState(null); // Debounce lock
     const roomId = `room-${stake}`;
 
     useEffect(() => {
@@ -156,6 +157,8 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
 
     const toggleCartela = (id) => {
         if (roomStatus !== 'WAITING') return;
+        if (processingId) return; // Prevent spam clicking
+
         const isDeselect = selectedIds.includes(id);
 
         if (!isDeselect) {
@@ -168,6 +171,10 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
         }
 
         if (takenCartelas[id] && !isDeselect) return;
+
+        // Set processing lock for 300ms
+        setProcessingId(id);
+        setTimeout(() => setProcessingId(null), 300);
 
         if (isDeselect) {
             setSelectedIds(prev => prev.filter(item => item !== id));
