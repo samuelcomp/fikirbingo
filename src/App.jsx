@@ -182,7 +182,7 @@ function App() {
                             <CartelaSelection
                                 user={user}
                                 stake={stake}
-                                userBalance={user?.playBalance || 0}
+                                onUpdateUser={setUser}
                                 onGameStart={handleGameStart}
                                 t={t}
                             />

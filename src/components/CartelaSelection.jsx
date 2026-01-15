@@ -24,8 +24,8 @@ const BalanceModal = ({ isOpen, onClose, t }) => {
                     <AlertCircle size={32} color="#f87171" />
                 </div>
                 <h3>Insufficient Balance!</h3>
-                <p className="amharic-text">ለጨዋታው በቂ ቀሪ ሂሳብ የለዎትም።</p>
-                <p className="english-text">You don't have enough balance to play the game.</p>
+                <p className="amharic-text">ለጨዋታው በቂ ቀሪ ሂሳብ የለዎትም። እባክዎን ወደ ሂሳብዎ ገንዘብ ያስገቡ።</p>
+                <p className="english-text">You don't have enough balance to play. Please deposit or convert your winnings.</p>
 
                 <div className="modal-actions">
                     <button className="deposit-redirect-btn" onClick={() => window.location.href = '/wallet'}>
@@ -100,6 +100,14 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
             }
         });
 
+        s.on('user_update', (updatedUser) => {
+            console.log('[Socket] User balance updated');
+            // This event is handled by the parent (App.jsx) in some designs, 
+            // but here we can try to update local state or let it propagate.
+            // Since `user` is a prop, we need a callback to update it in App.jsx.
+            if (onUpdateUser) onUpdateUser(updatedUser);
+        });
+
         s.on('error', (msg) => {
             setSelectionError(msg);
             setTimeout(() => setSelectionError(null), 3000);
@@ -164,9 +172,12 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
         const isDeselect = selectedIds.includes(id);
 
         if (!isDeselect) {
-            // Check play balance vs stake
-            const balance = user?.playBalance || 0;
-            if (balance < stake) {
+            // Check combined balance (Play + Main)
+            const playBal = Number(user?.playBalance || 0);
+            const mainBal = Number(user?.mainBalance || 0);
+            const totalAvailable = playBal + mainBal;
+
+            if (totalAvailable < stake) {
                 setIsBalanceModalOpen(true);
                 return;
             }
@@ -263,6 +274,13 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
                 <div className="selection-error-banner upscale-reveal">
                     <AlertCircle size={16} />
                     <span>{selectionError}</span>
+                </div>
+            )}
+
+            {roomStatus === 'FINISHED' && (
+                <div className="selection-error-banner info-mode upscale-reveal">
+                    <Loader2 size={16} className="spinning" />
+                    <span>Preparing Next Round... (የሚቀጥለው ዙር በመዘጋጀት ላይ)</span>
                 </div>
             )}
 
