@@ -69,8 +69,7 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
 
         s.on('room_state', (data) => {
             if (data.roomId === roomId) {
-                setCountdown(data.countdown);
-                setDisplayCountdown(data.countdown); // Sync local display
+                setDisplayCountdown(data.countdown); // Immediate sync on re-entry
                 setRoomStatus(data.status);
                 setTakenCartelas(data.takenCartelas || {});
                 setPlayersCount(data.playersCount || 0);
@@ -84,7 +83,6 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
 
         s.on('room_tick', (data) => {
             if (data.roomId === roomId) {
-                setCountdown(data.countdown);
                 // Only sync local display if it's more than 2 seconds off or if it's a reset
                 setDisplayCountdown(prev => {
                     if (Math.abs(prev - data.countdown) > 2) return data.countdown;
