@@ -20,6 +20,7 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
 
     const isWatcher = selectedCartelas.length === 0;
     const [socket, setSocket] = useState(null);
+    const audioRef = React.useRef(new Audio('/assets/bingo_win.mp3')); // Ensure this file exists
 
     useEffect(() => {
         const token = localStorage.getItem('userToken');
@@ -92,6 +93,13 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
             if (s) s.disconnect();
         };
     }, [roomId, user?.id, onGameOver]);
+
+    // Audio Effect - Only play ONCE when winner is first set
+    useEffect(() => {
+        if (winner && isVoiceEnabled) {
+            audioRef.current.play().catch(e => console.log('Audio play failed:', e));
+        }
+    }, [winner, isVoiceEnabled]); // Logic: Only triggers when 'winner' changes from null to object.
 
     const getBallColor = (num) => {
         if (num <= 15) return '#2563eb'; // B
