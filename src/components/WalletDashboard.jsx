@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Wallet, Clock, CheckCircle, RotateCcw } from 'lucide-react';
+import { Wallet, Clock, CheckCircle, RotateCcw, ArrowDownLeft, ArrowUpRight, Ticket, Coins, History } from 'lucide-react';
 
 const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\s/g, '');
 
@@ -70,23 +70,38 @@ const WalletDashboard = ({ user, onUpdateUser, t }) => {
 
             <div className="transaction-list-v2">
                 {history.length > 0 ? (
-                    history.map((tx, i) => (
-                        <div key={tx.id} className="transaction-card-v2 upscale-reveal" style={{ animationDelay: `${i * 0.05}s` }}>
-                            <div className="tx-icon-v2">
-                                <div className="wallet-icon-box-v2">
-                                    <Wallet size={18} color="#3b82f6" />
+                    history.map((tx, i) => {
+                        const isPositive = ['WIN', 'REFUND', 'DEPOSIT', 'AIRDROP'].includes(tx.type);
+                        const TxIcon = tx.type === 'BET' ? Ticket :
+                            tx.type === 'WIN' ? Coins :
+                                isPositive ? ArrowDownLeft : ArrowUpRight;
+                        const iconColor = isPositive ? '#22c55e' : '#ef4444';
+
+                        return (
+                            <div key={tx.id} className="transaction-card-v2 upscale-reveal" style={{ animationDelay: `${i * 0.05}s` }}>
+                                <div className="tx-icon-v2">
+                                    <div className="wallet-icon-box-v2" style={{ background: `${iconColor}20` }}>
+                                        <TxIcon size={18} color={iconColor} />
+                                    </div>
+                                </div>
+                                <div className="tx-details-v2">
+                                    <span className="tx-type-v2">
+                                        {tx.type === 'BET' ? 'Game Bet' :
+                                            tx.type === 'WIN' ? 'Bingo Win' :
+                                                tx.type === 'REFUND' ? 'Bet Refund' :
+                                                    tx.type}
+                                    </span>
+                                    <span className="tx-date-v2">{new Date(tx.createdAt).toLocaleString()}</span>
+                                </div>
+                                <div className="tx-outcome-v2">
+                                    <span className="tx-amount-v2" style={{ color: iconColor }}>
+                                        {isPositive ? '+' : '-'}{tx.amount} <small>Birr</small>
+                                    </span>
+                                    <span className={`tx-status-v2 approved`}>Completed</span>
                                 </div>
                             </div>
-                            <div className="tx-details-v2">
-                                <span className="tx-type-v2">{tx.type}</span>
-                                <span className="tx-date-v2">{new Date(tx.createdAt).toLocaleString()}</span>
-                            </div>
-                            <div className="tx-outcome-v2">
-                                <span className="tx-amount-v2">{tx.amount}</span>
-                                <span className="tx-status-v2 approved">Approved</span>
-                            </div>
-                        </div>
-                    ))
+                        );
+                    })
                 ) : (
                     <div className="no-transactions-v2">
                         <Clock size={48} strokeWidth={1} />
