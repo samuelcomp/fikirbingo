@@ -65,6 +65,10 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
         });
         setSocket(s);
 
+        s.on('connect', () => console.log('[Lobby Socket] Connected! ID:', s.id));
+        s.on('connect_error', (err) => console.error('[Lobby Socket] Error:', err.message));
+        s.on('disconnect', (reason) => console.warn('[Lobby Socket] Disconnected:', reason));
+
         s.emit('join_room', { roomId });
 
         s.on('room_state', (data) => {

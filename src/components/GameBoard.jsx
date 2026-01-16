@@ -32,6 +32,10 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
         });
         setSocket(s);
 
+        s.on('connect', () => console.log('[Socket] Connected to server! Socket ID:', s.id));
+        s.on('connect_error', (err) => console.error('[Socket] Connection failed:', err.message));
+        s.on('disconnect', (reason) => console.warn('[Socket] Disconnected:', reason));
+
         s.emit('join_room', { roomId });
 
         s.on('room_state', (data) => {
