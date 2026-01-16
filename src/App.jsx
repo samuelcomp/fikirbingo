@@ -44,14 +44,15 @@ function App() {
             const initData = window.Telegram?.WebApp?.initData;
             const token = localStorage.getItem('userToken');
 
-            if (initData) {
-                console.log('[App] Auth with initData');
+            const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+            if (initData || (isLocalhost && !token)) {
+                console.log(`[App] Auth with ${initData ? 'initData' : 'Dev Auth (localhost)'}`);
                 const authRes = await axios.post(`${API_URL}/api/auth`, { initData });
                 localStorage.setItem('userToken', authRes.data.token);
                 setUser(authRes.data.user);
                 setMustRegister(authRes.data.mustRegister);
 
-                // If they are NOT in mustRegister state, but we were showing the register page, switch to landing
                 if (!authRes.data.mustRegister && view === 'register') {
                     setView('landing');
                 }
@@ -59,7 +60,8 @@ function App() {
                 console.log('[App] Auth with token');
                 fetchUserProfile();
             } else {
-                fetchUserProfile();
+                // No token, no initData, not localhost - might be a regular browser visit to ngrok
+                console.log('[App] No auth source found');
             }
         } catch (e) {
             console.error('Initialization failed', e);
