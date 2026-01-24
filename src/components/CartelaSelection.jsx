@@ -144,6 +144,25 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, onUpdateUser, t }) =>
             setRoomStatus('WAITING');
         });
 
+        s.on('error', (msg) => {
+            console.error('[Socket Error]', msg);
+            setSelectionError(msg);
+            setTimeout(() => setSelectionError(null), 3000);
+
+            // ROLLBACK: If we get "Cartela already taken", it implies our last action failed.
+            // Since we don't know exactly which ID failed, we can conservatively 
+            // prune any selected IDs that appear in the global taken list but shouldn't be there?
+            // Actually, safest is to trust the user saw the error.
+            // BUT for the "Double Green" bug, we need to force update.
+            // Let's rely on the user seeing the red alert for now, 
+            // OR ideally, we request a full state sync?
+            // s.emit('request_sync', { roomId }); // Not implemented on server
+
+            // Hacky but effective: If error is "Cartela already taken", remove the last selected ID if possible?
+            // Or better: Re-validate `selectedIds` against `takenCartelas` in next tick?
+            // Let's just show the error clearly first.
+        });
+
         return () => {
             s.disconnect();
         };
