@@ -93,9 +93,14 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, onUpdateUser, t }) =>
                 setPlayersCount(data.playersCount || 0);
                 setPrizePool(data.prizePool || 0);
 
-                if (data.mySelections) {
+                if (data.status === 'FINISHED') {
+                    // Force clear if game is finished (even if server sends old data)
+                    setSelectedIds([]);
+                    setTakenCartelas({});
+                } else if (data.mySelections) {
                     setSelectedIds(data.mySelections);
                 }
+
                 if (data.maxCartelas) setMaxCartelas(data.maxCartelas);
             }
         });
@@ -144,23 +149,27 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, onUpdateUser, t }) =>
             setRoomStatus('WAITING');
         });
 
-        s.on('error', (msg) => {
+        s.on('error', (err) => {
+            let msg = 'Unknown Error';
+            let badId = null;
+
+            if (err) {
+                if (typeof err === 'string') {
+                    msg = err;
+                } else if (typeof err === 'object') {
+                    msg = err.message || JSON.stringify(err);
+                    badId = err.cartelaId;
+                }
+            }
+
             console.error('[Socket Error]', msg);
             setSelectionError(msg);
             setTimeout(() => setSelectionError(null), 3000);
 
-            // ROLLBACK: If we get "Cartela already taken", it implies our last action failed.
-            // Since we don't know exactly which ID failed, we can conservatively 
-            // prune any selected IDs that appear in the global taken list but shouldn't be there?
-            // Actually, safest is to trust the user saw the error.
-            // BUT for the "Double Green" bug, we need to force update.
-            // Let's rely on the user seeing the red alert for now, 
-            // OR ideally, we request a full state sync?
-            // s.emit('request_sync', { roomId }); // Not implemented on server
-
-            // Hacky but effective: If error is "Cartela already taken", remove the last selected ID if possible?
-            // Or better: Re-validate `selectedIds` against `takenCartelas` in next tick?
-            // Let's just show the error clearly first.
+            if (badId) {
+                console.log(`[Lobby] Rolling back selection for ${badId}`);
+                setSelectedIds(prev => prev.filter(id => id !== badId));
+            }
         });
 
         return () => {
@@ -352,12 +361,7 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, onUpdateUser, t }) =>
                 </div>
             )}
 
-            {roomStatus === 'FINISHED' && (
-                <div className="selection-error-banner info-mode upscale-reveal">
-                    <Loader2 size={16} className="spinning" />
-                    <span>Preparing Next Round... (የሚቀጥለው ዙር በመዘጋጀት ላይ)</span>
-                </div>
-            )}
+            {/* Banner Removed - Clean slate immediately */}
 
             <div className="selection-progress-bar">
                 <div className="progress-info">
