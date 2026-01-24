@@ -287,10 +287,7 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, onUpdateUser, t }) =>
                     <span className="box-label">Main Wallet</span>
                     <span className="box-value">{localBalances.main}</span>
                 </div>
-                <div className="status-box">
-                    <span className="box-label">Play Wallet</span>
-                    <span className="box-value">{localBalances.play}</span>
-                </div>
+                {/* Play Wallet Removed */}
                 <div className="status-box">
                     <span className="box-label">Stake (Per Card)</span>
                     <span className="box-value">{stake}</span>

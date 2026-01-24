@@ -169,7 +169,7 @@ function App() {
                                 onPlay={handlePlay}
                                 appName={branding.appName}
                                 appLogo={branding.appLogo}
-                                userBalance={user?.playBalance || 0}
+                                userBalance={user?.mainBalance || 0}
                                 t={t}
                                 mustRegister={mustRegister}
                             />

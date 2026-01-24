@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Wallet, Clock, CheckCircle, RotateCcw, ArrowDownLeft, ArrowUpRight, Ticket, Coins, History } from 'lucide-react';
+import { Wallet, Clock, CheckCircle, RotateCcw, ArrowDownLeft, ArrowUpRight, Ticket, History } from 'lucide-react';
 
 const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\s/g, '');
 
@@ -73,7 +73,7 @@ const WalletDashboard = ({ user, onUpdateUser, t }) => {
                     history.map((tx, i) => {
                         const isPositive = ['WIN', 'REFUND', 'DEPOSIT', 'AIRDROP'].includes(tx.type);
                         const TxIcon = tx.type === 'BET' ? Ticket :
-                            tx.type === 'WIN' ? Coins :
+                            tx.type === 'WIN' ? Ticket : // Use Ticket instead of Coins
                                 isPositive ? ArrowDownLeft : ArrowUpRight;
                         const iconColor = isPositive ? '#22c55e' : '#ef4444';
 

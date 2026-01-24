@@ -32,13 +32,7 @@ const ProfilePage = ({ user, lang, onToggleLang, onLogout, t }) => {
                         <span className="v2-lab">PLAYS</span>
                     </div>
                 </div>
-                <div className="p-stat-card cyan-glow">
-                    <Star className="stat-icon-v2" />
-                    <div className="stat-text-v2">
-                        <span className="v2-val">{user?.coins || 0}</span>
-                        <span className="v2-lab">COINS</span>
-                    </div>
-                </div>
+
             </div>
 
             <div className="profile-menu-v2">
