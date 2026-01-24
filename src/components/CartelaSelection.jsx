@@ -289,8 +289,12 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
                     <span className="box-value">{user?.playBalance || 0}</span>
                 </div>
                 <div className="status-box">
-                    <span className="box-label">Stake</span>
+                    <span className="box-label">Stake (Per Card)</span>
                     <span className="box-value">{stake}</span>
+                </div>
+                <div className="status-box highlight-purple">
+                    <span className="box-label">Total Bet</span>
+                    <span className="box-value">{stake * selectedIds.length} <small>Birr</small></span>
                 </div>
                 <div className="status-box highlight">
                     <span className="box-label">Prize Pool</span>
