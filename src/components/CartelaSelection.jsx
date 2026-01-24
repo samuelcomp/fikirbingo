@@ -147,7 +147,37 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, onUpdateUser, t }) =>
         return () => clearInterval(timer);
     }, [roomStatus]);
 
-    // ... (rest of code) ...
+    useEffect(() => {
+        if (roomStatus === 'PLAYING') {
+            console.log('[Lobby] Game started! Auto-transitioning...');
+            const cards = selectedIds.map(id => generateDeterministicCard(id));
+            onGameStart(cards);
+        }
+    }, [roomStatus, selectedIds, onGameStart]);
+
+    const generateDeterministicCard = (id) => {
+        const getNumbers = (cardId, offset, min, max, count) => {
+            const pool = [];
+            for (let i = min; i <= max; i++) pool.push(i);
+            const result = [];
+            for (let i = 0; i < count; i++) {
+                const index = (cardId * (i + offset + 7) + 13) % pool.length;
+                result.push(pool.splice(index, 1)[0]);
+            }
+            return result.sort((a, b) => a - b);
+        };
+
+        return {
+            id,
+            numbers: {
+                B: getNumbers(id, 0, 1, 15, 5),
+                I: getNumbers(id, 1, 16, 30, 5),
+                N: getNumbers(id, 2, 31, 45, 5).map((n, i) => i === 2 ? 'FREE' : n),
+                G: getNumbers(id, 3, 46, 60, 5),
+                O: getNumbers(id, 4, 61, 75, 5)
+            }
+        };
+    };
 
     return (
         <div className="lobby-container-v3">
