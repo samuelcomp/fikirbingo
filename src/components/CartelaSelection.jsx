@@ -59,6 +59,9 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, onUpdateUser, t }) =>
         play: user?.playBalance || 0
     });
 
+    // Add Syncing State
+    const [isSyncing, setIsSyncing] = useState(true);
+
     const roomId = `room-${stake}`;
 
     useEffect(() => {
@@ -78,6 +81,7 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, onUpdateUser, t }) =>
         s.emit('join_room', { roomId });
 
         s.on('room_state', (data) => {
+            setIsSyncing(false); // Data received, stop syncing
             if (data.roomId === roomId) {
                 setDisplayCountdown(data.countdown);
                 setRoomStatus(data.status);
@@ -97,6 +101,7 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, onUpdateUser, t }) =>
         });
 
         s.on('room_tick', (data) => {
+            setIsSyncing(false); // Data received, stop syncing
             if (data.roomId === roomId) {
                 setDisplayCountdown(prev => {
                     if (prev === null) return data.countdown;
@@ -178,6 +183,18 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, onUpdateUser, t }) =>
             }
         };
     };
+
+    if (isSyncing) {
+        return (
+            <div className="loading-screen">
+                <div className="spinner-container">
+                    <Loader2 size={48} className="spinning" color="#8b5cf6" />
+                    <p className="loading-text">Checking Server Status...</p>
+                    <small style={{ color: '#aaa', marginTop: '10px' }}>Syncing game state</small>
+                </div>
+            </div>
+        );
+    }
 
     const toggleCartela = (id) => {
         if (roomStatus !== 'WAITING') return;
