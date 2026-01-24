@@ -40,7 +40,7 @@ const BalanceModal = ({ isOpen, onClose, t }) => {
 
 const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\s/g, '');
 
-const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
+const CartelaSelection = ({ user, stake = 10, onGameStart, onUpdateUser, t }) => {
     const [socket, setSocket] = useState(null);
     const [selectedIds, setSelectedIds] = useState([]);
     const [takenCartelas, setTakenCartelas] = useState({}); // Now maps id -> true
@@ -52,6 +52,13 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
     const [isBalanceModalOpen, setIsBalanceModalOpen] = useState(false);
     const [processingId, setProcessingId] = useState(null); // Debounce lock
     const [maxCartelas, setMaxCartelas] = useState(2);
+
+    // Real-time Balance State
+    const [localBalances, setLocalBalances] = useState({
+        main: user?.mainBalance || 0,
+        play: user?.playBalance || 0
+    });
+
     const roomId = `room-${stake}`;
 
     useEffect(() => {
