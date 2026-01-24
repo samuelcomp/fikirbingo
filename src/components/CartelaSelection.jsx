@@ -51,6 +51,7 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
     const [selectionError, setSelectionError] = useState(null);
     const [isBalanceModalOpen, setIsBalanceModalOpen] = useState(false);
     const [processingId, setProcessingId] = useState(null); // Debounce lock
+    const [maxCartelas, setMaxCartelas] = useState(2);
     const roomId = `room-${stake}`;
 
     useEffect(() => {
@@ -84,6 +85,7 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
                 if (data.mySelections) {
                     setSelectedIds(data.mySelections);
                 }
+                if (data.maxCartelas) setMaxCartelas(data.maxCartelas);
             }
         });
 
@@ -97,6 +99,7 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
                 setRoomStatus(data.status);
                 setPlayersCount(data.playersCount || 0);
                 setPrizePool(data.prizePool || 0);
+                if (data.maxCartelas) setMaxCartelas(data.maxCartelas);
 
                 if (data.takenIds) {
                     const mapped = {};
@@ -157,6 +160,24 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
         };
     };
 
+    const [maxCartelas, setMaxCartelas] = useState(2); // Default
+
+    useEffect(() => {
+        // ... (socket connection logic) ...
+
+        socket?.on('room_state', (data) => {
+            // ... (keep existing logic) ...
+            if (data.maxCartelas) setMaxCartelas(data.maxCartelas);
+        });
+
+        socket?.on('room_tick', (data) => {
+            // ...
+            if (data.maxCartelas) setMaxCartelas(data.maxCartelas);
+        });
+
+    }, [socket]); // We need to ensure we don't break the existing useEffect dep array. 
+    // Actually, easier to simple inject the state setter inside the existing listeners.
+
     const toggleCartela = (id) => {
         if (roomStatus !== 'WAITING') return;
         if (processingId) return; // Prevent spam clicking
@@ -164,6 +185,15 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
         const isDeselect = selectedIds.includes(id);
 
         if (!isDeselect) {
+            // MAX LIMIT CHECK
+            if (selectedIds.length >= maxCartelas) {
+                // Determine if we are just re-selecting (shouldn't happen with includes check above)
+                // If distinct, show error.
+                setSelectionError(`You can only select up to ${maxCartelas} cartelas!`);
+                setTimeout(() => setSelectionError(null), 3000);
+                return;
+            }
+
             const cost = stake;
             const currentBalance = (user.playBalance || 0) + (user.mainBalance || 0);
             if (currentBalance < cost) {
@@ -181,7 +211,7 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, t }) => {
         if (isDeselect) {
             setSelectedIds(prev => prev.filter(item => item !== id));
             socket.emit('deselect_cartela', { roomId, cartelaId: id });
-        } else if (selectedIds.length < 2) {
+        } else if (selectedIds.length < maxCartelas) {
             setSelectedIds(prev => [...prev, id]);
             socket.emit('select_cartela', { roomId, cartelaId: id });
         }
