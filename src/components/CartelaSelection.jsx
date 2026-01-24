@@ -137,6 +137,13 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, onUpdateUser, t }) =>
             }
         });
 
+        s.on('game_reset', () => {
+            console.log('[Lobby] Game Reset Event! Clearing selections.');
+            setSelectedIds([]);
+            setTakenCartelas({});
+            setRoomStatus('WAITING');
+        });
+
         return () => {
             s.disconnect();
         };
