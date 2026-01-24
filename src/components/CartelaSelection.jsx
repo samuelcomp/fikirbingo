@@ -28,9 +28,7 @@ const BalanceModal = ({ isOpen, onClose, t }) => {
                 <p className="english-text">You don't have enough balance to play. Please deposit or convert your winnings.</p>
 
                 <div className="modal-actions">
-                    <button className="deposit-redirect-btn" onClick={() => window.location.href = '/wallet'}>
-                        Deposit Now 💳
-                    </button>
+
                     <button className="close-modal-btn" onClick={onClose}>
                         Close
                     </button>
