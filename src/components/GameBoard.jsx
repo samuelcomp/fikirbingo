@@ -76,8 +76,7 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                     prizePool: data.prizePool,
                     resetIn: data.resetIn || 0
                 }));
-                if (data.winnerData) {
-                    console.log('📢 Winner data received via TICK:', data.winnerData);
+                if (data.winnerData !== undefined) {
                     setWinner(data.winnerData);
                 }
             }
