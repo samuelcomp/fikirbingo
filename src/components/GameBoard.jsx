@@ -260,7 +260,7 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
             </footer>
 
             {/* Winner Overlay - High Fidelity Restoration with Crash Protection */}
-            {winner && (
+            {winner && (Array.isArray(winner) ? winner.length > 0 : true) && (
                 <div className="bingo-modal-overlay">
                     <div className="bingo-modal-content upscale-reveal-v4 gold-border-prestige">
                         <div className="crown-circle-v4">
