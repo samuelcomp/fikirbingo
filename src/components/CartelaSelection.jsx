@@ -179,6 +179,85 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, onUpdateUser, t }) =>
         };
     };
 
+    const toggleCartela = (id) => {
+        if (roomStatus !== 'WAITING') return;
+        if (processingId) return; // Prevent spam clicking
+
+        const isDeselect = selectedIds.includes(id);
+
+        if (!isDeselect) {
+            // MAX LIMIT CHECK
+            if (selectedIds.length >= maxCartelas) {
+                // Determine if we are just re-selecting (shouldn't happen with includes check above)
+                // If distinct, show error.
+                setSelectionError(`You can only select up to ${maxCartelas} cartelas!`);
+                setTimeout(() => setSelectionError(null), 3000);
+                return;
+            }
+
+            const cost = stake;
+            // Use local balances for check
+            const currentBalance = Number(localBalances.play) + Number(localBalances.main);
+            if (currentBalance < cost) {
+                setIsBalanceModalOpen(true);
+                return;
+            }
+        }
+
+        if (takenCartelas[id] && !isDeselect) return;
+
+        // Set processing lock for 300ms
+        setProcessingId(id);
+        setTimeout(() => setProcessingId(null), 300);
+
+        if (isDeselect) {
+            setSelectedIds(prev => prev.filter(item => item !== id));
+            socket.emit('deselect_cartela', { roomId, cartelaId: id });
+        } else if (selectedIds.length < maxCartelas) {
+            setSelectedIds(prev => [...prev, id]);
+            socket.emit('select_cartela', { roomId, cartelaId: id });
+        }
+    };
+
+    const isTakenByOther = (id) => {
+        return takenCartelas[id] && !selectedIds.includes(id);
+    };
+
+    const getBallColor = (num) => {
+        if (num <= 15) return '#2563eb'; // B
+        if (num <= 30) return '#7c3aed'; // I
+        if (num <= 45) return '#db2777'; // N
+        if (num <= 60) return '#059669'; // G
+        return '#ea580c'; // O
+    };
+
+    const renderPreview = (id) => {
+        const card = generateDeterministicCard(id);
+        const columns = ['B', 'I', 'N', 'G', 'O'];
+
+        return (
+            <div key={id} className="preview-card-v3 upscale-reveal">
+                <div className="preview-header-v3">
+                    <span>Cartela No : {id}</span>
+                </div>
+                <div className="bingo-grid-mini-v3">
+                    {columns.map((col, idx) => (
+                        <div key={col} className="bingo-col-mini-v3">
+                            <div className="col-header-mini-v3" style={{ backgroundColor: getBallColor(idx * 15 + 1) }}>{col}</div>
+                            {card.numbers[col].map((num, i) => (
+                                <div key={i} className={`mini-cell-v3 ${num === 'FREE' ? 'free' : ''}`}>
+                                    {num === 'FREE' ? <span className="free-star">✨</span> : num}
+                                </div>
+                            ))}
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    };
+
+    const selectionProgress = (selectedIds.length / 2) * 100;
+
     return (
         <div className="lobby-container-v3">
             {/* ... header ... */}
