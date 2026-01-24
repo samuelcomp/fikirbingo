@@ -120,10 +120,22 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, onUpdateUser, t }) =>
             }
         });
 
+        // Listen for real-time balance updates
+        s.on('user_update', (updatedUser) => {
+            if (updatedUser) {
+                console.log('[Lobby] Balance Update:', updatedUser);
+                setLocalBalances({
+                    main: updatedUser.mainBalance,
+                    play: updatedUser.playBalance
+                });
+                if (onUpdateUser) onUpdateUser(prev => ({ ...prev, ...updatedUser }));
+            }
+        });
+
         return () => {
             s.disconnect();
         };
-    }, [roomId, user?.telegramId]);
+    }, [roomId, user?.telegramId]); // Keep dependencies stable
 
     useEffect(() => {
         if (roomStatus !== 'WAITING') return;
@@ -135,136 +147,11 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, onUpdateUser, t }) =>
         return () => clearInterval(timer);
     }, [roomStatus]);
 
-    useEffect(() => {
-        if (roomStatus === 'PLAYING') {
-            console.log('[Lobby] Game started! Auto-transitioning...');
-            const cards = selectedIds.map(id => generateDeterministicCard(id));
-            onGameStart(cards);
-        }
-    }, [roomStatus, selectedIds, onGameStart]);
-
-    const generateDeterministicCard = (id) => {
-        const getNumbers = (cardId, offset, min, max, count) => {
-            const pool = [];
-            for (let i = min; i <= max; i++) pool.push(i);
-            const result = [];
-            for (let i = 0; i < count; i++) {
-                const index = (cardId * (i + offset + 7) + 13) % pool.length;
-                result.push(pool.splice(index, 1)[0]);
-            }
-            return result.sort((a, b) => a - b);
-        };
-
-        return {
-            id,
-            numbers: {
-                B: getNumbers(id, 0, 1, 15, 5),
-                I: getNumbers(id, 1, 16, 30, 5),
-                N: getNumbers(id, 2, 31, 45, 5).map((n, i) => i === 2 ? 'FREE' : n),
-                G: getNumbers(id, 3, 46, 60, 5),
-                O: getNumbers(id, 4, 61, 75, 5)
-            }
-        };
-    };
-
-    const [maxCartelas, setMaxCartelas] = useState(2); // Default
-
-    useEffect(() => {
-        // ... (socket connection logic) ...
-
-        socket?.on('room_state', (data) => {
-            // ... (keep existing logic) ...
-            if (data.maxCartelas) setMaxCartelas(data.maxCartelas);
-        });
-
-        socket?.on('room_tick', (data) => {
-            // ...
-            if (data.maxCartelas) setMaxCartelas(data.maxCartelas);
-        });
-
-    }, [socket]); // We need to ensure we don't break the existing useEffect dep array. 
-    // Actually, easier to simple inject the state setter inside the existing listeners.
-
-    const toggleCartela = (id) => {
-        if (roomStatus !== 'WAITING') return;
-        if (processingId) return; // Prevent spam clicking
-
-        const isDeselect = selectedIds.includes(id);
-
-        if (!isDeselect) {
-            // MAX LIMIT CHECK
-            if (selectedIds.length >= maxCartelas) {
-                // Determine if we are just re-selecting (shouldn't happen with includes check above)
-                // If distinct, show error.
-                setSelectionError(`You can only select up to ${maxCartelas} cartelas!`);
-                setTimeout(() => setSelectionError(null), 3000);
-                return;
-            }
-
-            const cost = stake;
-            const currentBalance = (user.playBalance || 0) + (user.mainBalance || 0);
-            if (currentBalance < cost) {
-                setIsBalanceModalOpen(true);
-                return;
-            }
-        }
-
-        if (takenCartelas[id] && !isDeselect) return;
-
-        // Set processing lock for 300ms
-        setProcessingId(id);
-        setTimeout(() => setProcessingId(null), 300);
-
-        if (isDeselect) {
-            setSelectedIds(prev => prev.filter(item => item !== id));
-            socket.emit('deselect_cartela', { roomId, cartelaId: id });
-        } else if (selectedIds.length < maxCartelas) {
-            setSelectedIds(prev => [...prev, id]);
-            socket.emit('select_cartela', { roomId, cartelaId: id });
-        }
-    };
-
-    const isTakenByOther = (id) => {
-        return takenCartelas[id] && !selectedIds.includes(id);
-    };
-
-    const getBallColor = (num) => {
-        if (num <= 15) return '#2563eb'; // B
-        if (num <= 30) return '#7c3aed'; // I
-        if (num <= 45) return '#db2777'; // N
-        if (num <= 60) return '#059669'; // G
-        return '#ea580c'; // O
-    };
-
-    const renderPreview = (id) => {
-        const card = generateDeterministicCard(id);
-        const columns = ['B', 'I', 'N', 'G', 'O'];
-
-        return (
-            <div key={id} className="preview-card-v3 upscale-reveal">
-                <div className="preview-header-v3">
-                    <span>Cartela No : {id}</span>
-                </div>
-                <div className="bingo-grid-mini-v3">
-                    {columns.map((col, idx) => (
-                        <div key={col} className="bingo-col-mini-v3">
-                            <div className="col-header-mini-v3" style={{ backgroundColor: getBallColor(idx * 15 + 1) }}>{col}</div>
-                            {card.numbers[col].map((num, i) => (
-                                <div key={i} className={`mini-cell-v3 ${num === 'FREE' ? 'free' : ''}`}>
-                                    {num === 'FREE' ? <span className="free-star">✨</span> : num}
-                                </div>
-                            ))}
-                        </div>
-                    ))}
-                </div>
-            </div>
-        );
-    };
-
-    const selectionProgress = (selectedIds.length / 2) * 100;
+    // ... (rest of code) ...
 
     return (
         <div className="lobby-container-v3">
+            {/* ... header ... */}
             <header className="lobby-header-v3">
                 <button className="header-action-btn back" onClick={() => window.history.back()}>
                     <ChevronLeft size={22} />
@@ -289,11 +176,11 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, onUpdateUser, t }) =>
             <div className="lobby-status-grid">
                 <div className="status-box">
                     <span className="box-label">Main Wallet</span>
-                    <span className="box-value">{user?.mainBalance || 0}</span>
+                    <span className="box-value">{localBalances.main}</span>
                 </div>
                 <div className="status-box">
                     <span className="box-label">Play Wallet</span>
-                    <span className="box-value">{user?.playBalance || 0}</span>
+                    <span className="box-value">{localBalances.play}</span>
                 </div>
                 <div className="status-box">
                     <span className="box-label">Stake (Per Card)</span>
