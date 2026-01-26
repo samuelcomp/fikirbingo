@@ -12,6 +12,9 @@ const WalletDashboard = ({ user, onUpdateUser, t }) => {
     const [submitStatus, setSubmitStatus] = useState(null); // 'success' | 'error' | null
     const [statusMessage, setStatusMessage] = useState('');
 
+    const [isSmsMode, setIsSmsMode] = useState(false);
+    const [smsText, setSmsText] = useState('');
+
     useEffect(() => {
         fetchHistory();
     }, []);
@@ -29,6 +32,38 @@ const WalletDashboard = ({ user, onUpdateUser, t }) => {
             console.error('Wallet fetch failed');
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const handleSmsParse = () => {
+        let extractedAmount = '';
+        let extractedRef = '';
+        const text = smsText;
+
+        if (selectedBank === 'telebirr') {
+            // Telebirr pattern: Transaction ID: BK..., Amount: ETB 10.00
+            const refMatch = text.match(/Transaction ID[:\s]+([A-Z0-9]+)/i);
+            const amtMatch = text.match(/Amount[:\s]+ETB\s?([0-9.]+)/i) || text.match(/received\s+ETB\s?([0-9.]+)/i);
+            if (refMatch) extractedRef = refMatch[1];
+            if (amtMatch) extractedAmount = amtMatch[1];
+        } else {
+            // CBE Pattern: Ref: FT..., Amount: 100.00
+            const refMatch = text.match(/Ref(?:erence)?(?:\s+No)?[:\s]+([A-Z0-9]+)/i);
+            const amtMatch = text.match(/ETB\s?([0-9,.]+)/i);
+            if (refMatch) extractedRef = refMatch[1];
+            if (amtMatch) extractedAmount = amtMatch[1].replace(/,/g, '');
+        }
+
+        if (extractedRef || extractedAmount) {
+            setReference(extractedRef);
+            setAmount(extractedAmount);
+            setIsSmsMode(false); // Switch back to see extracted data
+            setStatusMessage('Details extracted from SMS! Please verify before submitting.');
+            setSubmitStatus('success');
+            setTimeout(() => setSubmitStatus(null), 3000);
+        } else {
+            setStatusMessage('Could not find transaction details in this SMS.');
+            setSubmitStatus('error');
         }
     };
 
@@ -52,8 +87,8 @@ const WalletDashboard = ({ user, onUpdateUser, t }) => {
                 setStatusMessage(res.data.message || 'Deposit pending approval!');
                 setAmount('');
                 setReference('');
-                fetchHistory(); // Refresh history
-                // Switch to history tab after short delay? No, stay here for feedback.
+                setSmsText('');
+                fetchHistory();
             }
         } catch (err) {
             setSubmitStatus('error');
@@ -64,7 +99,7 @@ const WalletDashboard = ({ user, onUpdateUser, t }) => {
     };
 
     const MERCHANT_INFO = {
-        telebirr: { number: '0912345678', name: 'Beteseb Bingo' }, // Replace with real values
+        telebirr: { number: '0912345678', name: 'Beteseb Bingo' },
         cbe: { number: '1000123456789', name: 'Beteseb Bingo Ent.' }
     };
 
@@ -125,6 +160,21 @@ const WalletDashboard = ({ user, onUpdateUser, t }) => {
                         </div>
                     )}
 
+                    <div className="mode-toggle-pills">
+                        <button
+                            className={`mode-pill ${!isSmsMode ? 'active' : ''}`}
+                            onClick={() => setIsSmsMode(false)}
+                        >
+                            Manual Info
+                        </button>
+                        <button
+                            className={`mode-pill ${isSmsMode ? 'active' : ''}`}
+                            onClick={() => setIsSmsMode(true)}
+                        >
+                            Paste SMS
+                        </button>
+                    </div>
+
                     <form onSubmit={handleDeposit} className="deposit-form">
                         <div className="form-group">
                             <label>Select Payment Method</label>
@@ -146,41 +196,66 @@ const WalletDashboard = ({ user, onUpdateUser, t }) => {
                             </div>
                         </div>
 
-                        <div className="merchant-info-card">
-                            <p className="merchant-label">Transfer to this Number:</p>
-                            <h3 className="merchant-number">{MERCHANT_INFO[selectedBank].number}</h3>
-                            <p className="merchant-name">{MERCHANT_INFO[selectedBank].name}</p>
-                            <small className="instruction-text">
-                                Copy this number, go to your {selectedBank === 'telebirr' ? 'Telebirr App' : 'CBE App'}, and transfer the amount. Then enter the details below.
-                            </small>
-                        </div>
+                        {isSmsMode ? (
+                            <div className="sms-paste-area upscale-reveal">
+                                <div className="form-group">
+                                    <label>Paste the Full Confirmation SMS here</label>
+                                    <textarea
+                                        placeholder="Paste your Telebirr or CBE confirmation message..."
+                                        value={smsText}
+                                        onChange={(e) => setSmsText(e.target.value)}
+                                        rows={5}
+                                    />
+                                </div>
+                                <button
+                                    type="button"
+                                    className="secondary-action-btn"
+                                    onClick={handleSmsParse}
+                                    disabled={!smsText.trim()}
+                                >
+                                    Extract Reference & Amount
+                                </button>
+                            </div>
+                        ) : (
+                            <>
+                                <div className="merchant-info-card">
+                                    <p className="merchant-label">Transfer to this Number:</p>
+                                    <h3 className="merchant-number">{MERCHANT_INFO[selectedBank].number}</h3>
+                                    <p className="merchant-name">{MERCHANT_INFO[selectedBank].name}</p>
+                                    <small className="instruction-text">
+                                        Transfer the amount first, then enter the details below.
+                                    </small>
+                                </div>
 
-                        <div className="form-group">
-                            <label>Amount Deposited (Birr)</label>
-                            <input
-                                type="number"
-                                placeholder="e.g. 50"
-                                value={amount}
-                                onChange={(e) => setAmount(e.target.value)}
-                                min="10"
-                                required
-                            />
-                        </div>
+                                <div className="form-group">
+                                    <label>Amount (Birr)</label>
+                                    <input
+                                        type="number"
+                                        placeholder="Amount"
+                                        value={amount}
+                                        onChange={(e) => setAmount(e.target.value)}
+                                        required
+                                    />
+                                </div>
 
-                        <div className="form-group">
-                            <label>Transaction Reference ID</label>
-                            <input
-                                type="text"
-                                placeholder={selectedBank === 'telebirr' ? 'e.g. BK5S...' : 'Transaction Ref'}
-                                value={reference}
-                                onChange={(e) => setReference(e.target.value)}
-                                required
-                            />
-                        </div>
+                                <div className="form-group">
+                                    <label>Transaction Reference ID</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Ref ID"
+                                        value={reference}
+                                        onChange={(e) => setReference(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                            </>
+                        )}
 
-                        <button type="submit" className="submit-deposit-btn" disabled={isLoading}>
-                            {isLoading ? <Clock className="spinning" size={18} /> : 'Verify & Deposit'}
-                        </button>
+                        {!isSmsMode && (
+                            <button type="submit" className="submit-deposit-btn" disabled={isLoading || !amount || !reference}>
+                                {isLoading ? <Clock className="spinning" size={18} /> : 'Submit for Verification'}
+                            </button>
+                        )}
                     </form>
                 </div>
             )}
