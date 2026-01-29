@@ -92,6 +92,10 @@ function App() {
             alert(t.mustRegisterError);
             return;
         }
+        if (user?.canPlay === false) {
+            alert('Your access to game play is currently restricted. Please contact support.');
+            return;
+        }
         setStake(amount);
         setView('lobby');
     };
@@ -129,6 +133,30 @@ function App() {
     const isNotTelegram = !window.Telegram?.WebApp?.initData &&
         !window.location.hostname.includes('localhost') &&
         !window.location.hostname.includes('127.0.0.1');
+
+    if (branding.isMaintenance) {
+        return (
+            <div className="access-denied-screen">
+                <div className="denied-card upscale-reveal">
+                    <h1>🚧 Under Maintenance</h1>
+                    <p>Fikir Bingo is currently undergoing scheduled maintenance. Please check back later.</p>
+                    <p>ጥገና ላይ ነን። እባክዎ ቆይተው ይሞክሩ።</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (user?.isBlocked) {
+        return (
+            <div className="access-denied-screen">
+                <div className="denied-card upscale-reveal">
+                    <h1>⛔ Account Blocked</h1>
+                    <p>Your account has been suspended by administration. Please contact support for more details.</p>
+                    <p>የእርስዎ መለያ ታግዷል። እባክዎ ድጋፍ ሰጪዎችን ያነጋግሩ።</p>
+                </div>
+            </div>
+        );
+    }
 
     if (isNotTelegram) {
         return (
