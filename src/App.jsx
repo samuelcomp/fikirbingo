@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import LandingPage from './components/LandingPage';
 import CartelaSelection from './components/CartelaSelection';
@@ -178,72 +179,133 @@ function App() {
     return (
         <div className="app-main">
             <div className="content-area">
-                {view === 'register' && (
-                    <RegisterPage
-                        API_URL={API_URL}
-                        t={t}
-                        onRegisterSuccess={() => {
-                            setMustRegister(false);
-                            setView('landing');
-                            initApp();
-                        }}
-                    />
-                )}
+                <AnimatePresence mode="wait">
+                    {view === 'register' && (
+                        <motion.div
+                            key="register"
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            transition={{ duration: 0.3 }}
+                        >
+                            <RegisterPage
+                                API_URL={API_URL}
+                                t={t}
+                                onRegisterSuccess={() => {
+                                    setMustRegister(false);
+                                    setView('landing');
+                                    initApp();
+                                }}
+                            />
+                        </motion.div>
+                    )}
 
-                {!mustRegister && view !== 'register' && (
-                    <>
-                        {view === 'landing' && (
-                            <LandingPage
-                                onPlay={handlePlay}
-                                appName={branding.appName}
-                                appLogo={branding.appLogo}
-                                userBalance={user?.mainBalance || 0}
-                                t={t}
-                                mustRegister={mustRegister}
-                            />
-                        )}
-                        {view === 'leaderboard' && (
-                            <Leaderboard t={t} user={user} />
-                        )}
-                        {view === 'history' && (
-                            <GameHistory t={t} user={user} />
-                        )}
-                        {view === 'lobby' && (
-                            <CartelaSelection
-                                user={user}
-                                stake={stake}
-                                onUpdateUser={setUser}
-                                onGameStart={handleGameStart}
-                                t={t}
-                            />
-                        )}
-                        {view === 'game' && (
-                            <GameBoard
-                                user={user}
-                                roomId={`room-${stake}`}
-                                selectedCartelas={selectedCartelas}
-                                onGameOver={handleGameOver}
-                                t={t}
-                            />
-                        )}
-                        {view === 'wallet' && (
-                            <WalletDashboard
-                                user={user}
-                                onUpdateUser={fetchUserProfile}
-                                t={t}
-                            />
-                        )}
-                        {view === 'profile' && (
-                            <ProfilePage
-                                user={user}
-                                lang={lang}
-                                onToggleLang={() => setLang(lang === 'en' ? 'am' : 'en')}
-                                onLogout={handleLogout}
-                                t={t}
-                            />
-                        )}
-                    </>
-                )}
+                    {!mustRegister && view !== 'register' && (
+                        <>
+                            {view === 'landing' && (
+                                <motion.div
+                                    key="landing"
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }}
+                                    transition={{ duration: 0.4 }}
+                                >
+                                    <LandingPage
+                                        onPlay={handlePlay}
+                                        appName={branding.appName}
+                                        appLogo={branding.appLogo}
+                                        userBalance={user?.mainBalance || 0}
+                                        t={t}
+                                        mustRegister={mustRegister}
+                                    />
+                                </motion.div>
+                            )}
+                            {view === 'leaderboard' && (
+                                <motion.div
+                                    key="leaderboard"
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -20 }}
+                                >
+                                    <Leaderboard t={t} user={user} />
+                                </motion.div>
+                            )}
+                            {view === 'history' && (
+                                <motion.div
+                                    key="history"
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -20 }}
+                                >
+                                    <GameHistory t={t} user={user} />
+                                </motion.div>
+                            )}
+                            {view === 'lobby' && (
+                                <motion.div
+                                    key="lobby"
+                                    initial={{ opacity: 0, x: 30 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -30 }}
+                                >
+                                    <CartelaSelection
+                                        user={user}
+                                        stake={stake}
+                                        onUpdateUser={setUser}
+                                        onGameStart={handleGameStart}
+                                        t={t}
+                                    />
+                                </motion.div>
+                            )}
+                            {view === 'game' && (
+                                <motion.div
+                                    key="game"
+                                    initial={{ opacity: 0, scale: 1.1 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.9 }}
+                                >
+                                    <GameBoard
+                                        user={user}
+                                        roomId={`room-${stake}`}
+                                        selectedCartelas={selectedCartelas}
+                                        onGameOver={handleGameOver}
+                                        t={t}
+                                        branding={branding}
+                                    />
+                                </motion.div>
+                            )}
+                            {view === 'wallet' && (
+                                <motion.div
+                                    key="wallet"
+                                    initial={{ opacity: 0, x: -30 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: 30 }}
+                                >
+                                    <WalletDashboard
+                                        user={user}
+                                        onUpdateUser={fetchUserProfile}
+                                        t={t}
+                                    />
+                                </motion.div>
+                            )}
+                            {view === 'profile' && (
+                                <motion.div
+                                    key="profile"
+                                    initial={{ opacity: 0, y: 30 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: 30 }}
+                                >
+                                    <ProfilePage
+                                        user={user}
+                                        lang={lang}
+                                        onToggleLang={() => setLang(lang === 'en' ? 'am' : 'en')}
+                                        onLogout={handleLogout}
+                                        t={t}
+                                    />
+                                </motion.div>
+                            )}
+                        </>
+                    )}
+                </AnimatePresence>
 
                 {mustRegister && view !== 'register' && (
                     <div className="registration-gate upscale-reveal">

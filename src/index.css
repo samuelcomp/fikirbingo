@@ -28,9 +28,11 @@
   --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-premium: 0 0 20px rgba(168, 85, 247, 0.2), 0 0 40px rgba(168, 85, 247, 0.1);
 
   --font-main: 'Outfit', 'Inter', sans-serif;
   --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 * {
@@ -206,30 +208,75 @@ body {
   background: transparent;
 }
 
-/* Moving Background Pattern */
-.landing-container::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle at center, hsla(355, 78%, 56%, 0.15) 0%, transparent 40%),
-    radial-gradient(circle at 70% 30%, hsla(174, 100%, 41%, 0.1), transparent 30%),
-    radial-gradient(circle at 20% 80%, hsla(38, 92%, 55%, 0.1), transparent 30%);
-  animation: bg-move 20s infinite linear;
-  pointer-events: none;
-  z-index: 0;
-}
-
 @keyframes bg-move {
   0% {
-    transform: rotate(0deg);
+    transform: translate(0, 0) rotate(0deg);
+  }
+
+  50% {
+    transform: translate(10%, 10%) rotate(180deg);
   }
 
   100% {
-    transform: rotate(360deg);
+    transform: translate(0, 0) rotate(360deg);
   }
+}
+
+.premium-mesh-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  background: var(--bg-dark);
+  overflow: hidden;
+}
+
+.mesh-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.4;
+  animation: bg-move 20s infinite alternate cubic-bezier(0.45, 0, 0.55, 1);
+}
+
+.orb-1 {
+  width: 400px;
+  height: 400px;
+  background: var(--primary);
+  top: -100px;
+  right: -100px;
+  animation-duration: 25s;
+}
+
+.orb-2 {
+  width: 350px;
+  height: 350px;
+  background: var(--secondary);
+  bottom: -50px;
+  left: -50px;
+  animation-delay: -5s;
+}
+
+.orb-3 {
+  width: 300px;
+  height: 300px;
+  background: var(--accent);
+  top: 50%;
+  left: 50%;
+  animation-delay: -10s;
+}
+
+.landing-container {
+  padding: 24px;
+  max-width: 480px;
+  margin: 0 auto;
+  position: relative;
+  background: transparent;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .landing-main,

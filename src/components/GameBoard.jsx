@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import confetti from 'canvas-confetti';
 import { io } from 'socket.io-client';
 import { Trophy, LogOut, RotateCcw, Volume2, VolumeX, Info } from 'lucide-react';
 
 const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\s/g, '');
 
-const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver, t }) => {
+const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver, t, branding }) => {
     const [gameState, setGameState] = useState({
         gameId: '...',
         playersCount: 0,
@@ -15,12 +17,22 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
     });
     const [winner, setWinner] = useState(null);
     const [isAutomatic, setIsAutomatic] = useState(true);
-    const [isVoiceEnabled, setIsVoiceEnabled] = useState(true);
+    const [isVoiceEnabled, setIsVoiceEnabled] = useState(branding?.isVoiceEnabled !== false);
     const [currentBall, setCurrentBall] = useState(null);
 
     const isWatcher = selectedCartelas.length === 0;
     const [socket, setSocket] = useState(null);
-    const audioRef = React.useRef(new Audio('/assets/bingo_win.mp3')); // Ensure this file exists
+    const audioRef = React.useRef(new Audio('/assets/bingo_win.mp3'));
+    const voiceRef = React.useRef(new Audio());
+
+    const playBingoVoice = (num) => {
+        if (!isVoiceEnabled || !branding?.voicePack) return;
+        try {
+            // Path: /assets/voices/[amharic/english]/[1-75].mp3
+            voiceRef.current.src = `/assets/voices/${branding.voicePack}/${num}.mp3`;
+            voiceRef.current.play().catch(e => console.log('Voice play failed (File might be missing):', e));
+        } catch (e) { console.error('Voice system error:', e); }
+    };
 
     useEffect(() => {
         const token = localStorage.getItem('userToken');
@@ -60,6 +72,7 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
 
         s.on('ball_drawn', (data) => {
             setCurrentBall(data.ball);
+            playBingoVoice(data.ball);
             setGameState(prev => ({
                 ...prev,
                 calledNumbers: [...prev.calledNumbers, data.ball]
@@ -97,12 +110,30 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
         };
     }, [roomId, user?.id, onGameOver]);
 
-    // Audio Effect - Only play ONCE when winner is first set
+    // Audio Effect & Congratulations Confetti
     useEffect(() => {
         if (winner && isVoiceEnabled) {
             audioRef.current.play().catch(e => console.log('Audio play failed:', e));
+
+            // Trigger Confetti for a WOW win!
+            const count = 200;
+            const defaults = { origin: { y: 0.7 }, zIndex: 10000 };
+
+            function fire(particleRatio, opts) {
+                confetti({
+                    ...defaults,
+                    ...opts,
+                    particleCount: Math.floor(count * particleRatio)
+                });
+            }
+
+            fire(0.25, { spread: 26, startVelocity: 55 });
+            fire(0.2, { spread: 60 });
+            fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+            fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
+            fire(0.1, { spread: 120, startVelocity: 45 });
         }
-    }, [winner, isVoiceEnabled]); // Logic: Only triggers when 'winner' changes from null to object.
+    }, [winner, isVoiceEnabled]);
 
     const getBallColor = (num) => {
         if (num <= 15) return '#2563eb'; // B
@@ -131,9 +162,14 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                             {(card.numbers[col] || []).map((num, i) => {
                                 const isMarked = gameState.calledNumbers.includes(num) || num === 'FREE';
                                 return (
-                                    <div key={i} className={`mini-num-v3 ${isMarked ? 'marked' : ''}`}>
-                                        {num === 'FREE' ? <span className="free-star">✨</span> : num}
-                                    </div>
+                                    <motion.div
+                                        key={i}
+                                        className={`mini-num-v3 ${isMarked ? 'marked' : ''}`}
+                                        animate={isMarked ? { scale: [1, 1.2, 1], rotate: [0, 5, -5, 0] } : {}}
+                                        transition={{ type: 'spring', stiffness: 300 }}
+                                    >
+                                        {num === 'FREE' ? <motion.span className="free-star" animate={{ rotate: 360 }} transition={{ duration: 5, repeat: Infinity, ease: 'linear' }}>✨</motion.span> : num}
+                                    </motion.div>
                                 );
                             })}
                         </div>
@@ -202,16 +238,37 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                     </div>
 
                     <div className="current-ball-v3">
-                        {currentBall ? (
-                            <div className="focus-ball-v3 shadow-pulse" style={{ borderColor: getBallColor(currentBall) }}>
-                                <span className="focus-letter-v3" style={{ color: getBallColor(currentBall) }}>{getBallLetter(currentBall)}</span>
-                                <span className="focus-val-v3">{currentBall}</span>
-                            </div>
-                        ) : (
-                            <div className="focus-ball-v3 waiting">
-                                <span className="wait-txt">WAITING</span>
-                            </div>
-                        )}
+                        <AnimatePresence mode="wait">
+                            {currentBall ? (
+                                <motion.div
+                                    key={currentBall}
+                                    initial={{ scale: 0.4, opacity: 0, rotate: -180 }}
+                                    animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                                    exit={{ scale: 1.5, opacity: 0, filter: 'blur(10px)' }}
+                                    transition={{ type: 'spring', damping: 12 }}
+                                    className="focus-ball-v3 shadow-pulse"
+                                    style={{ borderColor: getBallColor(currentBall) }}
+                                >
+                                    <span className="focus-letter-v3" style={{ color: getBallColor(currentBall) }}>{getBallLetter(currentBall)}</span>
+                                    <span className="focus-val-v3">{currentBall}</span>
+                                    <motion.div
+                                        className="ball-aura"
+                                        animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.4, 0.2] }}
+                                        transition={{ duration: 2, repeat: Infinity }}
+                                        style={{ backgroundColor: getBallColor(currentBall) }}
+                                    />
+                                </motion.div>
+                            ) : (
+                                <motion.div
+                                    key="waiting"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    className="focus-ball-v3 waiting"
+                                >
+                                    <span className="wait-txt">WAITING</span>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
 
                     <div className="auto-toggle-row-v3">

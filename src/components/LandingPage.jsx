@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { Play, Trophy, Users, History, Wallet, HelpCircle, CheckCircle2 } from 'lucide-react';
 import { logoBase64 } from '../assets/logo';
 
@@ -6,43 +7,61 @@ const LandingPage = ({ onPlay, appName, appLogo, t, userBalance = 0, mustRegiste
     const [showRules, setShowRules] = useState(false);
     const [selectedStake, setSelectedStake] = useState(10);
 
-    const stats = [
-        { label: t.activePlayers, value: '45K+', icon: <Users size={20} /> },
-        { label: t.gamesPlayed, value: '60K+', icon: <History size={20} /> },
-        { label: t.winnersDaily, value: '500+', icon: <Trophy size={20} /> },
-    ];
-
     const authenticLogo = logoBase64;
 
     return (
         <div className="premium-bg-container">
+            {/* Mesh Orbs - Visual Wow Factor */}
+            <div className="premium-mesh-bg">
+                <div className="mesh-orb orb-1"></div>
+                <div className="mesh-orb orb-2"></div>
+                <div className="mesh-orb orb-3"></div>
+            </div>
+
             <div className="landing-container">
-                <header className="landing-header animate-reveal delay-1">
+                <motion.header
+                    className="landing-header"
+                    initial={{ y: -50, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ type: 'spring', damping: 20 }}
+                >
                     <div className="logo-section">
                         <div className="premium-logo-wrapper">
-                            <img
-                                src={authenticLogo}
-                                alt="Fikir Bingo"
-                                className="premium-logo-img"
-                            />
+                            <img src={authenticLogo} alt="Logo" className="premium-logo-img" />
                         </div>
                     </div>
                     <button className="rules-btn prestige-btn" onClick={() => setShowRules(true)}>
                         <HelpCircle size={18} />
                         <span>{t.rules}</span>
                     </button>
-                </header>
+                </motion.header>
 
                 <main className="landing-main no-scroll-main">
-                    <div className="welcome-section animate-reveal delay-2">
+                    <motion.div
+                        className="welcome-section"
+                        initial={{ opacity: 0, x: -50 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.2 }}
+                    >
                         <h2 className="brilliant-text">
-                            <span>{t.welcome}</span>
+                            <motion.span
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.4 }}
+                            >
+                                {t.welcome}
+                            </motion.span>
                             Fikir Bingo
                         </h2>
                         <p className="welcome-sub">Real-time multiplayer bingo. Big stakes, big wins.</p>
-                    </div>
+                    </motion.div>
 
-                    <div className="stake-card premium-card animate-reveal delay-3">
+                    <motion.div
+                        className="stake-card premium-card"
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.4 }}
+                    >
                         <div className="stake-header">
                             <span className="available-stakes-label">Available Stakes (መጠኖች)</span>
                             {!mustRegister && (
@@ -55,8 +74,10 @@ const LandingPage = ({ onPlay, appName, appLogo, t, userBalance = 0, mustRegiste
 
                         <div className="stake-options">
                             {[10, 50, 100].map((val, idx) => (
-                                <button
+                                <motion.button
                                     key={val}
+                                    whileHover={{ y: -5, scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
                                     className={`stake-btn-premium chip-style ${selectedStake === val ? 'selected' : ''}`}
                                     onClick={() => setSelectedStake(val)}
                                 >
@@ -65,18 +86,20 @@ const LandingPage = ({ onPlay, appName, appLogo, t, userBalance = 0, mustRegiste
                                     </div>
                                     <span className="stake-val">{val}</span>
                                     <span className="stake-unit">Birr</span>
-                                </button>
+                                </motion.button>
                             ))}
                         </div>
 
-                        <button
+                        <motion.button
+                            whileHover={{ scale: 1.03 }}
+                            whileTap={{ scale: 0.97 }}
                             className="play-btn prestige-action pulse active-play"
                             onClick={() => onPlay(selectedStake)}
                         >
                             <Play size={22} fill="currentColor" />
                             {t.playNow} - {selectedStake} Birr
-                        </button>
-                    </div>
+                        </motion.button>
+                    </motion.div>
                 </main>
 
                 {showRules && (
