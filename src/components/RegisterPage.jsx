@@ -48,7 +48,10 @@ const RegisterPage = ({ onRegisterSuccess, t, API_URL }) => {
             });
             onRegisterSuccess();
         } catch (e) {
-            setError("Failed to save contact. Please try again.");
+            console.error("Contact save error:", e);
+            // Extract the specific backend error message (e.g. Whitelist Block)
+            const msg = e.response?.data?.error || "Failed to save contact. Please try again.";
+            alert(msg);
         } finally {
             setIsLoading(false);
         }
