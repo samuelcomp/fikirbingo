@@ -327,27 +327,27 @@ function App() {
             {view !== 'game' && (
                 <nav className="bottom-nav-v2">
                     <button className={`nav-item-v2 ${view === 'landing' ? 'active' : ''}`} onClick={() => setView('landing')}>
-                        <Gamepad2 size={24} />
+                        <Gamepad2 size={20} />
                         <span>Game</span>
                     </button>
 
                     <button className={`nav-item-v2 ${view === 'leaderboard' ? 'active' : ''}`} onClick={() => setView('leaderboard')}>
-                        <TrophyIcon size={24} />
+                        <TrophyIcon size={20} />
                         <span>Scores</span>
                     </button>
 
                     <button className={`nav-item-v2 ${view === 'history' ? 'active' : ''}`} onClick={() => setView('history')}>
-                        <HistoryIcon size={24} />
+                        <HistoryIcon size={20} />
                         <span>History</span>
                     </button>
 
                     <button className={`nav-item-v2 ${view === 'wallet' ? 'active' : ''}`} onClick={() => setView('wallet')}>
-                        <Wallet size={24} />
+                        <Wallet size={20} />
                         <span>Wallet</span>
                     </button>
 
                     <button className={`nav-item-v2 ${view === 'profile' ? 'active' : ''}`} onClick={() => setView('profile')}>
-                        <UserIcon size={24} />
+                        <UserIcon size={20} />
                         <span>Profile</span>
                     </button>
                 </nav>
