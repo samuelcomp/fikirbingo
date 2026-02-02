@@ -573,10 +573,11 @@ body {
 .bottom-nav-v2 {
   position: fixed;
   bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: calc(100% - 32px);
+  left: 16px;
+  right: 16px;
+  width: auto;
   max-width: 480px;
+  margin: 0 auto;
   background: var(--bg-nav);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
@@ -5096,57 +5097,7 @@ input:checked+.slider-v3:before {
   color: #34d399;
 }
 
-/* New Bottom Nav V2 */
-.bottom-nav-v2 {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 80px;
-  background: #0f172a;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  padding: 0 10px 15px 10px;
-  z-index: 1000;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-}
 
-.nav-item-v2 {
-  background: transparent;
-  border: none;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  color: #94a3b8;
-  padding: 10px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  min-width: 60px;
-}
-
-.nav-item-v2 span {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.nav-item-v2.active {
-  color: #fff;
-  transform: translateY(-5px);
-}
-
-.nav-item-v2.active::after {
-  content: '';
-  position: absolute;
-  top: -10px;
-  width: 40px;
-  height: 2px;
-  background: #6366f1;
-  box-shadow: 0 0 10px #6366f1;
-  border-radius: 2px;
-}
 
 .no-history-v2,
 .no-transactions-v2 {
