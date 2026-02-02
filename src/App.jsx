@@ -8,8 +8,9 @@ import WalletDashboard from './components/WalletDashboard';
 import ProfilePage from './components/ProfilePage';
 import Leaderboard from './components/Leaderboard';
 import RegisterPage from './components/RegisterPage';
+import TransactionsPage from './components/TransactionsPage';
 import GameHistory from './components/GameHistory';
-import { Home, Trophy as TrophyIcon, Wallet, User as UserIcon, Gamepad2, History as HistoryIcon, Phone } from 'lucide-react';
+import { Home, Trophy as TrophyIcon, Wallet, User as UserIcon, Gamepad2, History as HistoryIcon, Phone, Receipt } from 'lucide-react';
 import { translations } from './translations';
 import './index.css';
 import './components-styles.css';
@@ -244,6 +245,16 @@ function App() {
                                     <GameHistory t={t} user={user} />
                                 </motion.div>
                             )}
+                            {view === 'transactions' && (
+                                <motion.div
+                                    key="transactions"
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -20 }}
+                                >
+                                    <TransactionsPage t={t} user={user} />
+                                </motion.div>
+                            )}
                             {view === 'lobby' && (
                                 <motion.div
                                     key="lobby"
@@ -327,27 +338,32 @@ function App() {
             {view !== 'game' && (
                 <nav className="bottom-nav-v2">
                     <button className={`nav-item-v2 ${view === 'landing' ? 'active' : ''}`} onClick={() => setView('landing')}>
-                        <Gamepad2 size={20} />
+                        <Gamepad2 size={18} />
                         <span>Game</span>
                     </button>
 
                     <button className={`nav-item-v2 ${view === 'leaderboard' ? 'active' : ''}`} onClick={() => setView('leaderboard')}>
-                        <TrophyIcon size={20} />
+                        <TrophyIcon size={18} />
                         <span>Scores</span>
                     </button>
 
                     <button className={`nav-item-v2 ${view === 'history' ? 'active' : ''}`} onClick={() => setView('history')}>
-                        <HistoryIcon size={20} />
-                        <span>History</span>
+                        <HistoryIcon size={18} />
+                        <span>Games</span>
+                    </button>
+
+                    <button className={`nav-item-v2 ${view === 'transactions' ? 'active' : ''}`} onClick={() => setView('transactions')}>
+                        <Receipt size={18} />
+                        <span>Txns</span>
                     </button>
 
                     <button className={`nav-item-v2 ${view === 'wallet' ? 'active' : ''}`} onClick={() => setView('wallet')}>
-                        <Wallet size={20} />
+                        <Wallet size={18} />
                         <span>Wallet</span>
                     </button>
 
                     <button className={`nav-item-v2 ${view === 'profile' ? 'active' : ''}`} onClick={() => setView('profile')}>
-                        <UserIcon size={20} />
+                        <UserIcon size={18} />
                         <span>Profile</span>
                     </button>
                 </nav>
