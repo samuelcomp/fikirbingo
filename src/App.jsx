@@ -245,16 +245,6 @@ function App() {
                                     <GameHistory t={t} user={user} />
                                 </motion.div>
                             )}
-                            {view === 'transactions' && (
-                                <motion.div
-                                    key="transactions"
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -20 }}
-                                >
-                                    <TransactionsPage t={t} user={user} />
-                                </motion.div>
-                            )}
                             {view === 'lobby' && (
                                 <motion.div
                                     key="lobby"
@@ -338,32 +328,27 @@ function App() {
             {view !== 'game' && (
                 <nav className="bottom-nav-v2">
                     <button className={`nav-item-v2 ${view === 'landing' ? 'active' : ''}`} onClick={() => setView('landing')}>
-                        <Gamepad2 size={18} />
+                        <Gamepad2 size={20} />
                         <span>Game</span>
                     </button>
 
                     <button className={`nav-item-v2 ${view === 'leaderboard' ? 'active' : ''}`} onClick={() => setView('leaderboard')}>
-                        <TrophyIcon size={18} />
+                        <TrophyIcon size={20} />
                         <span>Scores</span>
                     </button>
 
                     <button className={`nav-item-v2 ${view === 'history' ? 'active' : ''}`} onClick={() => setView('history')}>
-                        <HistoryIcon size={18} />
-                        <span>Games</span>
-                    </button>
-
-                    <button className={`nav-item-v2 ${view === 'transactions' ? 'active' : ''}`} onClick={() => setView('transactions')}>
-                        <Receipt size={18} />
-                        <span>Txns</span>
+                        <HistoryIcon size={20} />
+                        <span>History</span>
                     </button>
 
                     <button className={`nav-item-v2 ${view === 'wallet' ? 'active' : ''}`} onClick={() => setView('wallet')}>
-                        <Wallet size={18} />
+                        <Wallet size={20} />
                         <span>Wallet</span>
                     </button>
 
                     <button className={`nav-item-v2 ${view === 'profile' ? 'active' : ''}`} onClick={() => setView('profile')}>
-                        <UserIcon size={18} />
+                        <UserIcon size={20} />
                         <span>Profile</span>
                     </button>
                 </nav>
