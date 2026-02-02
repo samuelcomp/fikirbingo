@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Play, Trophy, Users, History, Wallet, HelpCircle, CheckCircle2 } from 'lucide-react';
+import { Play, Trophy, Users, History, Wallet, HelpCircle, CheckCircle2, Sparkles, Crown, Target } from 'lucide-react';
 import { logoBase64 } from '../assets/logo';
 
 const LandingPage = ({ onPlay, appName, appLogo, t, userBalance = 0, mustRegister = false }) => {
@@ -9,8 +9,29 @@ const LandingPage = ({ onPlay, appName, appLogo, t, userBalance = 0, mustRegiste
 
     const authenticLogo = logoBase64;
 
+    const stakeOptions = [
+        { value: 10, label: 'Starter', icon: Target, color: 'blue' },
+        { value: 50, label: 'Pro', icon: Sparkles, color: 'purple' },
+        { value: 100, label: 'VIP', icon: Crown, color: 'gold' }
+    ];
+
     return (
         <div className="premium-bg-container">
+            {/* Animated Particles Background */}
+            <div className="particle-container">
+                {[...Array(15)].map((_, i) => (
+                    <div
+                        key={i}
+                        className="particle"
+                        style={{
+                            left: `${Math.random() * 100}%`,
+                            animationDelay: `${Math.random() * 3}s`,
+                            animationDuration: `${3 + Math.random() * 2}s`
+                        }}
+                    />
+                ))}
+            </div>
+
             {/* Mesh Orbs - Visual Wow Factor */}
             <div className="premium-mesh-bg">
                 <div className="mesh-orb orb-1"></div>
@@ -18,93 +39,145 @@ const LandingPage = ({ onPlay, appName, appLogo, t, userBalance = 0, mustRegiste
                 <div className="mesh-orb orb-3"></div>
             </div>
 
-            <div className="landing-container">
+            <div className="landing-container-v3">
+                {/* Header with Rules Button */}
                 <motion.header
-                    className="landing-header"
-                    initial={{ y: -50, opacity: 0 }}
+                    className="landing-header-v3"
+                    initial={{ y: -30, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    transition={{ type: 'spring', damping: 20 }}
+                    transition={{ duration: 0.5 }}
                 >
-                    <div className="logo-section">
-                        <div className="premium-logo-wrapper">
-                            <img src={authenticLogo} alt="Logo" className="premium-logo-img" />
-                        </div>
-                    </div>
-                    <button className="rules-btn prestige-btn" onClick={() => setShowRules(true)}>
+                    <button className="rules-btn-v3" onClick={() => setShowRules(true)}>
                         <HelpCircle size={18} />
                         <span>{t.rules}</span>
                     </button>
                 </motion.header>
 
-                <main className="landing-main no-scroll-main">
+                <main className="landing-main-v3">
+                    {/* Hero Section with Logo */}
                     <motion.div
-                        className="welcome-section"
-                        initial={{ opacity: 0, x: -50 }}
-                        animate={{ opacity: 1, x: 0 }}
+                        className="hero-section-v3"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
                         transition={{ delay: 0.2 }}
                     >
-                        <h2 className="brilliant-text">
-                            <motion.span
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.4 }}
-                            >
-                                {t.welcome}
-                            </motion.span>
-                            Fikir Bingo
-                        </h2>
-                        <p className="welcome-sub">Real-time multiplayer bingo. Big stakes, big wins.</p>
-                    </motion.div>
-
-                    <motion.div
-                        className="stake-card premium-card"
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.4 }}
-                    >
-                        <div className="stake-header">
-                            <span className="available-stakes-label">Available Stakes (መጠኖች)</span>
-                            {!mustRegister && (
-                                <div className="wallet-pill gold-glow">
-                                    <Wallet size={12} className="wallet-icon-mini" />
-                                    {userBalance} Birr
-                                </div>
-                            )}
-                        </div>
-
-                        <div className="stake-options">
-                            {[10, 50, 100].map((val, idx) => (
-                                <motion.button
-                                    key={val}
-                                    whileHover={{ y: -5, scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    className={`stake-btn-premium chip-style ${selectedStake === val ? 'selected' : ''}`}
-                                    onClick={() => setSelectedStake(val)}
-                                >
-                                    <div className="selection-dot">
-                                        {selectedStake === val && <CheckCircle2 size={12} />}
-                                    </div>
-                                    <span className="stake-val">{val}</span>
-                                    <span className="stake-unit">Birr</span>
-                                </motion.button>
-                            ))}
-                        </div>
-
-                        <motion.button
-                            whileHover={{ scale: 1.03 }}
-                            whileTap={{ scale: 0.97 }}
-                            className="play-btn prestige-action pulse active-play"
-                            onClick={() => onPlay(selectedStake)}
+                        <motion.div
+                            className="hero-logo-container"
+                            initial={{ scale: 0, rotate: -180 }}
+                            animate={{ scale: 1, rotate: 0 }}
+                            transition={{ type: "spring", duration: 1, delay: 0.3 }}
                         >
-                            <Play size={22} fill="currentColor" />
-                            {t.playNow} - {selectedStake} Birr
-                        </motion.button>
+                            <div className="logo-glow-ring"></div>
+                            <img src={authenticLogo} alt="Logo" className="hero-logo" />
+                        </motion.div>
+
+                        <motion.h1
+                            className="hero-title-v3"
+                            initial={{ y: 30, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ delay: 0.6 }}
+                        >
+                            {t.welcome}
+                            <span className="gradient-text-v3">Fikir Bingo</span>
+                        </motion.h1>
+
+                        <motion.p
+                            className="hero-subtitle-v3"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.8 }}
+                        >
+                            Real-time multiplayer bingo. Big stakes, big wins. 🎰
+                        </motion.p>
                     </motion.div>
+
+                    {/* Balance Display */}
+                    {!mustRegister && (
+                        <motion.div
+                            className="balance-display-v3"
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ delay: 1 }}
+                        >
+                            <Wallet size={16} className="balance-icon" />
+                            <span className="balance-amount">{userBalance}</span>
+                            <span className="balance-currency">Birr</span>
+                        </motion.div>
+                    )}
+
+                    {/* Stake Selection */}
+                    <motion.div
+                        className="stake-selection-v3"
+                        initial={{ y: 40, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 1.1 }}
+                    >
+                        <h3 className="section-title-v3">Choose Your Stake</h3>
+
+                        <div className="stake-cards-grid-v3">
+                            {stakeOptions.map((stake, idx) => {
+                                const Icon = stake.icon;
+                                return (
+                                    <motion.div
+                                        key={stake.value}
+                                        className={`stake-card-v3 ${selectedStake === stake.value ? 'active' : ''} ${stake.color}`}
+                                        onClick={() => setSelectedStake(stake.value)}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 1.2 + idx * 0.1 }}
+                                        whileHover={{ scale: 1.05, y: -5 }}
+                                        whileTap={{ scale: 0.95 }}
+                                    >
+                                        <div className="stake-icon-v3">
+                                            <Icon size={28} />
+                                        </div>
+                                        <div className="stake-amount-v3">{stake.value}</div>
+                                        <div className="stake-currency-v3">BIRR</div>
+                                        <div className="stake-label-v3">{stake.label}</div>
+                                        {selectedStake === stake.value && (
+                                            <motion.div
+                                                className="selected-indicator-v3"
+                                                layoutId="selected"
+                                                initial={{ scale: 0 }}
+                                                animate={{ scale: 1 }}
+                                            >
+                                                <CheckCircle2 size={20} />
+                                            </motion.div>
+                                        )}
+                                    </motion.div>
+                                );
+                            })}
+                        </div>
+                    </motion.div>
+
+                    {/* Play Button */}
+                    <motion.button
+                        className="play-button-v3"
+                        onClick={() => onPlay(selectedStake)}
+                        initial={{ y: 40, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 1.5 }}
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
+                    >
+                        <div className="button-glow-v3"></div>
+                        <div className="button-content-v3">
+                            <Play size={24} fill="currentColor" />
+                            <span>PLAY NOW - {selectedStake} BIRR</span>
+                        </div>
+                    </motion.button>
                 </main>
 
+                {/* Rules Modal */}
                 {showRules && (
                     <div className="modal-overlay" onClick={() => setShowRules(false)}>
-                        <div className="modal-content premium-card glass-modal" onClick={e => e.stopPropagation()}>
+                        <motion.div
+                            className="modal-content premium-card glass-modal"
+                            onClick={e => e.stopPropagation()}
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.8, opacity: 0 }}
+                        >
                             <div className="modal-header">
                                 <h3>{t.rules} 📖</h3>
                                 <button className="close-modal" onClick={() => setShowRules(false)}>&times;</button>
@@ -127,7 +200,7 @@ const LandingPage = ({ onPlay, appName, appLogo, t, userBalance = 0, mustRegiste
                                 ))}
                             </div>
                             <button className="play-btn prestige-action" onClick={() => setShowRules(false)}>ጎበዝ! (Got it!)</button>
-                        </div>
+                        </motion.div>
                     </div>
                 )}
             </div>

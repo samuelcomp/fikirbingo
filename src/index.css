@@ -550,42 +550,46 @@ body {
 
 .bottom-nav {
   position: fixed;
-  bottom: 24px;
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  width: calc(100% - 48px);
-  max-width: 440px;
+  width: calc(100% - 32px);
+  max-width: 480px;
   background: var(--bg-nav);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   display: flex;
   justify-content: space-around;
-  padding: 12px 8px;
+  align-items: center;
+  padding: 14px 10px;
   border: 1px solid var(--glass-border);
   border-radius: 24px;
   z-index: 1000;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
   animation: fadeInUp 0.5s ease-out;
+  gap: 4px;
 }
 
 .bottom-nav-v2 {
   position: fixed;
-  bottom: 24px;
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  width: calc(100% - 48px);
-  max-width: 440px;
+  width: calc(100% - 32px);
+  max-width: 480px;
   background: var(--bg-nav);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   display: flex;
   justify-content: space-around;
-  padding: 12px 8px;
+  align-items: center;
+  padding: 14px 10px;
   border: 1px solid var(--glass-border);
   border-radius: 24px;
   z-index: 1000;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
   animation: fadeInUp 0.5s ease-out;
+  gap: 4px;
 }
 
 .nav-item {
@@ -596,15 +600,24 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
   cursor: pointer;
   transition: var(--transition-smooth);
-  padding: 10px 16px;
-  border-radius: 18px;
-  min-width: 70px;
+  padding: 8px 6px;
+  border-radius: 16px;
+  flex: 1;
+  max-width: 85px;
+}
+
+.nav-item span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  text-align: center;
 }
 
 .nav-item-v2 {
@@ -614,17 +627,26 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  font-size: 10px;
+  gap: 5px;
+  font-size: 9px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
   cursor: pointer;
   transition: var(--transition-smooth);
-  padding: 10px 16px;
-  border-radius: 18px;
-  min-width: 70px;
+  padding: 8px 6px;
+  border-radius: 16px;
   position: relative;
+  flex: 1;
+  max-width: 85px;
+}
+
+.nav-item-v2 span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  text-align: center;
 }
 
 .nav-item-v2:hover {
