@@ -599,6 +599,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 4px;
   font-size: 9px;
   font-weight: 700;
@@ -610,6 +611,7 @@ body {
   border-radius: 16px;
   flex: 1;
   max-width: 85px;
+  position: relative;
 }
 
 .nav-item span {
@@ -627,6 +629,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 5px;
   font-size: 9px;
   font-weight: 700;

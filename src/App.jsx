@@ -14,6 +14,8 @@ import { translations } from './translations';
 import './index.css';
 import './components-styles.css';
 import './landing-cartela-styles.css';
+import './gameboard-styles.css';
+import './cartela-selection-styles.css';
 
 const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\s/g, '');
 console.log('Fikir Bingo Debug - API_URL:', API_URL);
