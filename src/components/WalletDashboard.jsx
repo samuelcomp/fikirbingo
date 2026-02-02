@@ -11,6 +11,8 @@ const WalletDashboard = ({ user, onUpdateUser, t }) => {
     const [selectedBank, setSelectedBank] = useState('telebirr');
     const [submitStatus, setSubmitStatus] = useState(null); // 'success' | 'error' | null
     const [statusMessage, setStatusMessage] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [activeTab, setActiveTab] = useState('deposit');
 
     const [isSmsMode, setIsSmsMode] = useState(false);
     const [smsText, setSmsText] = useState('');

@@ -12,6 +12,7 @@ import GameHistory from './components/GameHistory';
 import { Home, Trophy as TrophyIcon, Wallet, User as UserIcon, Gamepad2, History as HistoryIcon, Phone } from 'lucide-react';
 import { translations } from './translations';
 import './index.css';
+import './components-styles.css';
 
 const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\s/g, '');
 console.log('Fikir Bingo Debug - API_URL:', API_URL);
