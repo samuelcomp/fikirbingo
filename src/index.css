@@ -59,6 +59,10 @@
 }
 
 
+html {
+  overflow-x: hidden;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -221,7 +225,7 @@ body {
   background: linear-gradient(135deg, #1a1b3b 0%, #0f1021 100%);
   color: white;
   position: relative;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 .landing-container {
@@ -5538,5 +5542,112 @@ input:checked+.slider-v3:before {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Premium Loading Screen Styles */
+.premium-loader {
+  background: radial-gradient(circle at center, #1a1b2e 0%, #0b0c16 100%) !important;
+  z-index: 9999;
+}
+
+.loader-glitch-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+}
+
+.loader-logo-circle {
+  width: 120px;
+  height: 120px;
+  background: var(--glass-bg);
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  box-shadow: 0 0 30px var(--accent-glow), inset 0 0 20px var(--accent-glow);
+  animation: float-animation 3s ease-in-out infinite;
+}
+
+.floating-logo {
+  filter: drop-shadow(0 0 10px var(--accent-glow));
+}
+
+.loader-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.loader-title {
+  font-size: 32px;
+  font-weight: 900;
+  background: linear-gradient(to bottom, #fff, var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  animation: titlePulse 2s ease-in-out infinite;
+}
+
+.loader-progress-bar {
+  width: 200px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+.loader-progress-shimmer {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  animation: shimmer-progress 1.5s infinite;
+}
+
+.loader-status {
+  font-size: 12px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+@keyframes float-animation {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+@keyframes shimmer-progress {
+  100% {
+    left: 100%;
+  }
+}
+
+@keyframes titlePulse {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.8;
+    transform: scale(0.98);
   }
 }

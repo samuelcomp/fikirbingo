@@ -127,10 +127,18 @@ function App() {
 
     if (isLoading) {
         return (
-            <div className="loading-screen">
-                <div className="spinner-container">
-                    <div className="heart-loader"></div>
-                    <p className="loading-text">Loading Fikir Bingo (በመጫን ላይ)...</p>
+            <div className="loading-screen premium-loader">
+                <div className="loader-glitch-container">
+                    <div className="loader-logo-circle">
+                        <Gamepad2 size={60} className="floating-logo" />
+                    </div>
+                    <div className="loader-content">
+                        <h1 className="loader-title">Beteseb Bingo</h1>
+                        <div className="loader-progress-bar">
+                            <div className="loader-progress-shimmer"></div>
+                        </div>
+                        <p className="loader-status">Initializing Game Experience...</p>
+                    </div>
                 </div>
             </div>
         );
