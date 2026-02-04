@@ -973,6 +973,7 @@ input:checked+.slider-v3:before {
         flex: none;
     }
 }
+
 /* RIGHT COLUMN SCROLL & GRID */
 .game-main-v3 {
     overflow-y: auto;
@@ -1007,158 +1008,88 @@ input:checked+.slider-v3:before {
 /* Restore left-game-column just in case, but we aren't using it now */
 
 
-/* MOBILE RESPONSIVE UPDATE FOR 3-COL */
+/* MOBILE ROBUST LAYOUT FIX */
 @media (max-width: 900px) {
-    .game-body-v3 {
-        flex-direction: column;
-    }
-    .game-info-sidebar, .bingo-sidebar-v3 {
-        width: 100%;
-        flex-direction: row;
-        flex-wrap: wrap;
-        overflow-y: visible;
-        min-height: auto;
-    }
-    /* Adjust Sidebar Grid for horizontal layout */
-    .sidebar-col-v3 {
-        flex-direction: row;
-        flex-wrap: wrap;
-    }
-}
 
-
-/* REVERT TO SINGLE SIDEBAR STACK */
-.left-game-column {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    width: 260px !important;
-    min-width: 260px !important;
-}
-
-.bingo-sidebar-v3 {
-    width: 100% !important;
-    min-width: 0 !important;
-    flex: 1;
-    overflow-y: auto !important;
-    max-height: none !important;
-}
-
-
-/* STRICT DASHBOARD LAYOUT */
-.game-view-v3 {
-    height: 100vh;
-    min-height: 0;
-    overflow: hidden;
-    padding-bottom: 0;
-}
-
-.game-body-v3 {
-    flex: 1;
-    min-height: 0; /* Crucial for nested flex scrolling */
-    overflow: hidden;
-}
-
-.left-game-column {
-    height: 100%;
-    overflow: hidden;
-}
-
-.bingo-sidebar-v3 {
-    overflow-y: auto !important;
-    flex: 1;
-    border-top: 1px solid var(--glass-border);
-    padding-top: 12px;
-    margin-top: 12px;
-}
-
-.game-main-v3 {
-    height: 100%;
-    overflow-y: auto;
-    padding-bottom: 120px; /* Space for fixed/overlay buttons if any */
-}
-
-
-/* FIX MOBILE SCROLLING */
-@media (max-width: 900px) {
+    /* Main Layout: Split Screen */
     .game-view-v3 {
-        height: auto !important;
-        min-height: 100vh;
-        overflow-y: auto !important;
+        height: 100vh !important;
+        overflow: hidden !important;
+        padding-bottom: 0;
     }
-    .game-body-v3 {
-        overflow: visible !important;
-        flex: none;
-    }
-    .left-game-column {
-        height: auto !important;
-        overflow: visible !important;
-    }
-    .game-main-v3 {
-        overflow: visible !important;
-        height: auto !important;
-    }
-}
 
-
-/* FORCE SIDE-BY-SIDE MOBILE */
-@media (max-width: 900px) {
     .game-body-v3 {
-        flex-direction: row !important; /* Keep side-by-side */
+        flex-direction: row !important;
         align-items: stretch;
+        overflow: hidden !important;
     }
+
+    /* Left Sidebar: Fixed Narrow Strip */
     .left-game-column {
-        width: 140px !important; /* Narrower sidebar for mobile */
+        width: 140px !important;
         min-width: 140px !important;
-        height: auto !important;
-        overflow-y: visible !important;
+        height: 100% !important;
+        overflow: hidden !important;
+        border-right: 1px solid var(--glass-border);
+        flex-shrink: 0;
+        z-index: 10;
+        background: var(--bg-dark);
+        /* Ensure no transparency overlap */
     }
-    /* Shrink ball size for mobile sidebar */
-    .focus-val-v3 { font-size: 32px !important; }
-    .focus-ball-v3 { width: 80px !important; height: 80px !important; }
-    /* Adjust Sidebar Grid for narrow width */
-    .sidebar-col-v3 { flex-direction: column !important; }
-    .sidebar-num-v3 { font-size: 8px !important; padding: 2px !important; }
+
+    /* Right Main: Flexible Area */
     .game-main-v3 {
-        overflow-y: auto !important;
-        height: auto !important;
         flex: 1;
+        height: 100% !important;
+        overflow-y: auto !important;
+        padding-bottom: 120px;
     }
-    /* Ensure Cartelas Grid adapts nicely */
+
+    /* Current Ball Scale Down */
+    .current-ball-v3 {
+        min-height: auto;
+        padding: 8px;
+    }
+
+    .focus-ball-v3 {
+        width: 70px !important;
+        height: 70px !important;
+    }
+
+    .focus-val-v3 {
+        font-size: 28px !important;
+    }
+
+    /* Grid Adjustment */
+    .bingo-sidebar-v3 {
+        width: 100% !important;
+        flex: 1;
+        justify-content: space-between;
+        padding: 0 4px;
+        overflow-y: auto !important;
+    }
+
+    .sidebar-col-v3 {
+        flex: 1;
+        min-width: 20px;
+        flex-direction: column !important;
+    }
+
+    .sidebar-letter-v3 {
+        font-size: 9px !important;
+        padding: 4px 0 !important;
+    }
+
+    .sidebar-num-v3 {
+        font-size: 9px !important;
+        padding: 4px 0 !important;
+        margin-bottom: 2px;
+    }
+
+    /* Cartelas */
     .cards-stack-v3 {
-        grid-template-columns: 1fr !important; /* Single column of cards if narrow */
-        padding-bottom: 150px;
+        grid-template-columns: 1fr !important;
+        padding: 12px;
+        gap: 20px;
     }
 }
-
-
-/* FORCE SIDE-BY-SIDE MOBILE */
-@media (max-width: 900px) {
-    .game-body-v3 {
-        flex-direction: row !important; /* Keep side-by-side */
-        align-items: stretch;
-    }
-    .left-game-column {
-        width: 140px !important; /* Narrower sidebar for mobile */
-        min-width: 140px !important;
-        height: auto !important;
-        overflow-y: visible !important;
-    }
-    /* Shrink ball size for mobile sidebar */
-    .focus-val-v3 { font-size: 32px !important; }
-    .focus-ball-v3 { width: 80px !important; height: 80px !important; }
-    /* Adjust Sidebar Grid for narrow width */
-    .sidebar-col-v3 { flex-direction: column !important; }
-    .sidebar-num-v3 { font-size: 8px !important; padding: 2px !important; }
-    .game-main-v3 {
-        overflow-y: auto !important;
-        height: auto !important;
-        flex: 1;
-    }
-    /* Ensure Cartelas Grid adapts nicely */
-    .cards-stack-v3 {
-        grid-template-columns: 1fr !important; /* Single column of cards if narrow */
-        padding-bottom: 150px;
-    }
-}
-
