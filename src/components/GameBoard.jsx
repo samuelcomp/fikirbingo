@@ -226,20 +226,33 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                             {currentBall ? (
                                 <motion.div
                                     key={currentBall}
-                                    initial={{ scale: 2.5, opacity: 0 }}
-                                    animate={{ scale: 1, opacity: 1 }}
-                                    exit={{ scale: 0, opacity: 0 }}
+                                    initial={{ scale: 4, opacity: 0, filter: 'blur(10px)' }}
+                                    animate={{ scale: 1, opacity: 1, filter: 'blur(0px)' }}
+                                    exit={{ scale: 0.5, opacity: 0 }}
                                     transition={{
                                         type: 'spring',
-                                        stiffness: 400,
-                                        damping: 25,
-                                        mass: 0.8
+                                        stiffness: 500,
+                                        damping: 15,
+                                        mass: 1
                                     }}
                                     className="focus-ball-v3"
                                     style={{ borderColor: getBallColor(currentBall) }}
                                 >
-                                    <span className="focus-letter-v3" style={{ color: getBallColor(currentBall) }}>{getBallLetter(currentBall)}</span>
-                                    <span className="focus-val-v3">{currentBall}</span>
+                                    <div className="focus-letter-v3">{getBallLetter(currentBall)}</div>
+                                    <div className="focus-val-v3">{currentBall}</div>
+
+                                    {/* Inner Gloss Overlay for extra "beauty" */}
+                                    <div style={{
+                                        position: 'absolute',
+                                        top: '10%',
+                                        left: '15%',
+                                        width: '35%',
+                                        height: '25%',
+                                        background: 'rgba(255,255,255,0.3)',
+                                        borderRadius: '50%',
+                                        filter: 'blur(3px)',
+                                        pointerEvents: 'none'
+                                    }} />
                                 </motion.div>
                             ) : (
                                 <motion.div
