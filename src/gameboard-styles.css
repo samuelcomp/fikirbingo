@@ -473,7 +473,7 @@ input:checked+.slider-v3:before {
     line-height: 1.5;
 }
 
-/* Game Footer */
+/* Game Footer - Floating Transparent */
 .game-footer-v3 {
     position: fixed;
     bottom: 20px;
@@ -484,11 +484,14 @@ input:checked+.slider-v3:before {
     display: flex;
     gap: 10px;
     padding: 12px;
-    background: var(--bg-nav);
-    backdrop-filter: blur(24px);
-    border: 1px solid var(--glass-border);
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    background: transparent !important;
+    /* Removed opaque background */
+    backdrop-filter: none !important;
+    /* Removed blur */
+    border: none !important;
+    /* Removed border */
+    box-shadow: none !important;
+    /* Removed shadow from container */
     z-index: 1000;
 }
 
@@ -1066,7 +1069,8 @@ input:checked+.slider-v3:before {
         padding: 4px !important;
         gap: 6px !important;
         width: 100% !important;
-        height: min-content !important;
+        height: auto !important;
+        /* Default to auto height for scrolling */
         min-height: 100% !important;
     }
 
@@ -1077,35 +1081,86 @@ input:checked+.slider-v3:before {
         width: 100% !important;
     }
 
-    /* 2 Cards: Split screen (both visible) */
+    /* 2 Cards: Strictly fit 50% screen height */
     .cards-stack-v3.count-2 {
         height: 100% !important;
         gap: 4px !important;
-        justify-content: flex-start !important;
+        justify-content: center !important;
+        /* Center to utilize all space */
+        overflow: hidden !important;
     }
 
     .cards-stack-v3.count-2 .game-card-v3 {
-        flex: 0 0 calc(50% - 4px) !important;
-        height: calc(50% - 4px) !important;
+        flex: 0 0 calc(50% - 6px) !important;
+        height: calc(50% - 6px) !important;
         min-height: 0 !important;
         padding: 4px !important;
     }
 
-    /* 3+ Cards: Scrollable list */
+    .cards-stack-v3.count-2 .mini-num-v3 {
+        font-size: 11px !important;
+        border-width: 1px !important;
+    }
+
+    .cards-stack-v3.count-2 .col-header-v3 {
+        font-size: 10px !important;
+        padding: 4px 2px !important;
+    }
+
+    /* 3 Cards: Strictly fit 33.3% screen height */
+    .cards-stack-v3.count-3 {
+        height: 100% !important;
+        gap: 3px !important;
+        justify-content: center !important;
+        overflow: hidden !important;
+    }
+
+    .cards-stack-v3.count-3 .game-card-v3 {
+        flex: 0 0 calc(33.33% - 4px) !important;
+        height: calc(33.33% - 4px) !important;
+        min-height: 0 !important;
+        padding: 2px !important;
+    }
+
+    .cards-stack-v3.count-3 .mini-num-v3 {
+        font-size: 10px !important;
+        border-width: 1px !important;
+    }
+
+    .cards-stack-v3.count-3 .col-header-v3 {
+        font-size: 9px !important;
+        padding: 2px 1px !important;
+    }
+
+    .cards-stack-v3.count-3 .bingo-grid-5x5-v3 {
+        gap: 2px !important;
+        margin-bottom: 2px !important;
+    }
+
+    .cards-stack-v3.count-3 .bingo-col-v3 {
+        gap: 2px !important;
+    }
+
+    /* 4+ Cards: Scrollable list */
     .cards-stack-v3.count-plus {
         height: auto !important;
         gap: 12px !important;
+        padding-bottom: 120px !important;
+        /* Back to normal padding since footer is transparent */
     }
 
     .cards-stack-v3.count-plus .game-card-v3 {
-        flex: 0 0 320px !important;
-        height: 320px !important;
-        min-height: 320px !important;
+        flex: 0 0 280px !important;
+        height: 280px !important;
+        min-height: 280px !important;
     }
 
     .game-card-v3 {
         flex-shrink: 0 !important;
         min-height: min-content !important;
         overflow: visible !important;
+        background: linear-gradient(135deg, var(--bg-card), var(--bg-elevated)) !important;
+        border: 1px solid var(--glass-border) !important;
+        border-radius: 12px !important;
     }
 }
