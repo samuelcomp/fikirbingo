@@ -273,7 +273,7 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                 </aside>
 
                 <main className="game-main-v3">
-                    <div className="cards-stack-v3">
+                    <div className={`cards-stack-v3 count-${selectedCartelas.length > 2 ? 'plus' : selectedCartelas.length}`}>
                         {isWatcher ? (
                             <div className="watcher-card-v3 upscale-reveal">
                                 <div className="watching-badge">Watching Only</div>

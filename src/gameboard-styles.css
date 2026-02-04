@@ -1058,15 +1058,49 @@ input:checked+.slider-v3:before {
         z-index: 5;
     }
 
-    /* Cartelas - Maximize Space */
+    /* Cartelas - Dynamic Sizing Based on Count */
     .cards-stack-v3 {
         display: flex !important;
         flex-direction: column !important;
         grid-template-columns: none !important;
-        max-height: none !important;
         padding: 4px !important;
-        gap: 12px !important;
+        gap: 6px !important;
         width: 100% !important;
+        height: min-content !important;
+        min-height: 100% !important;
+    }
+
+    /* 1 Card: Large and natural height */
+    .cards-stack-v3.count-1 .game-card-v3 {
+        flex: none !important;
+        height: auto !important;
+        width: 100% !important;
+    }
+
+    /* 2 Cards: Split screen (both visible) */
+    .cards-stack-v3.count-2 {
+        height: 100% !important;
+        gap: 4px !important;
+        justify-content: flex-start !important;
+    }
+
+    .cards-stack-v3.count-2 .game-card-v3 {
+        flex: 0 0 calc(50% - 4px) !important;
+        height: calc(50% - 4px) !important;
+        min-height: 0 !important;
+        padding: 4px !important;
+    }
+
+    /* 3+ Cards: Scrollable list */
+    .cards-stack-v3.count-plus {
+        height: auto !important;
+        gap: 12px !important;
+    }
+
+    .cards-stack-v3.count-plus .game-card-v3 {
+        flex: 0 0 320px !important;
+        height: 320px !important;
+        min-height: 320px !important;
     }
 
     .game-card-v3 {
