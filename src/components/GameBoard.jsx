@@ -295,67 +295,126 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                 <button className="action-btn-v3 refresh" onClick={() => window.location.reload()}>Refresh</button>
             </footer>
 
-            {/* Winner Overlay - High Fidelity Restoration with Crash Protection */}
-            {winner && (Array.isArray(winner) ? winner.length > 0 : true) && (
-                <div className="bingo-modal-overlay">
-                    <div className="bingo-modal-content upscale-reveal-v4 gold-border-prestige">
-                        <div className="crown-circle-v4">
-                            <Trophy size={40} className="crown-svg-v4" />
-                        </div>
+            {/* Winner Overlay - Enhanced with Animations */}
+            <AnimatePresence>
+                {winner && (Array.isArray(winner) ? winner.length > 0 : true) && (
+                    <motion.div
+                        className="bingo-modal-overlay"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        <motion.div
+                            className="bingo-modal-content upscale-reveal-v4 gold-border-prestige"
+                            initial={{ scale: 0.5, opacity: 0, y: 50 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.8, opacity: 0, y: 20 }}
+                            transition={{
+                                type: "spring",
+                                stiffness: 200,
+                                damping: 20,
+                                duration: 0.5
+                            }}
+                        >
+                            <motion.div
+                                className="crown-circle-v4"
+                                initial={{ scale: 0, rotate: -180 }}
+                                animate={{ scale: 1, rotate: 0 }}
+                                transition={{
+                                    delay: 0.2,
+                                    type: "spring",
+                                    stiffness: 150
+                                }}
+                            >
+                                <Trophy size={40} className="crown-svg-v4" />
+                            </motion.div>
 
-                        <h1 className="bingo-title-v4">BINGO!</h1>
+                            <motion.h1
+                                className="bingo-title-v4"
+                                initial={{ scale: 0.5, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                transition={{ delay: 0.3, duration: 0.4 }}
+                            >
+                                BINGO!
+                            </motion.h1>
 
-                        <div className="winners-list-v4">
-                            {(Array.isArray(winner) ? winner : [winner]).map((w, idx) => {
-                                if (!w) return null;
-                                return (
-                                    <div key={idx} className="winner-presentation-v4">
-                                        <div className="winner-label-v4">
-                                            🎉 <span className="name-v4">{w.username || 'Player'} WON!</span> 🎉
-                                        </div>
-
-                                        <div className="card-box-v4">
-                                            <div className="card-header-v4">
-                                                <Trophy size={14} /> Winning Cartela : {w.cartelaId || '...'}
+                            <div className="winners-list-v4">
+                                {(Array.isArray(winner) ? winner : [winner]).map((w, idx) => {
+                                    if (!w) return null;
+                                    return (
+                                        <motion.div
+                                            key={idx}
+                                            className="winner-presentation-v4"
+                                            initial={{ opacity: 0, x: -20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: 0.4 + idx * 0.1 }}
+                                        >
+                                            <div className="winner-label-v4">
+                                                🎉 <span className="name-v4">{w.username || 'Player'} WON!</span> 🎉
                                             </div>
-                                            <div className="grid-5x5-v4">
-                                                {['B', 'I', 'N', 'G', 'O'].map((col, cIdx) => (
-                                                    <div key={col} className="col-v4">
-                                                        <div className="header-v4" style={{ backgroundColor: getBallColor(cIdx * 15 + 1) }}>{col}</div>
-                                                        {(w.officialCard?.[col] || []).map((num, i) => {
-                                                            const isMarked = gameState.calledNumbers.includes(num) || num === 'FREE';
-                                                            return (
-                                                                <div key={i} className={`cell-v4 ${isMarked ? 'marked' : ''}`}>
-                                                                    {num === 'FREE' ? '✨' : num}
-                                                                </div>
-                                                            );
-                                                        })}
-                                                    </div>
-                                                ))}
+
+                                            <div className="card-box-v4">
+                                                <div className="card-header-v4">
+                                                    <Trophy size={14} /> Winning Cartela : {w.cartelaId || '...'}
+                                                </div>
+                                                <div className="grid-5x5-v4">
+                                                    {['B', 'I', 'N', 'G', 'O'].map((col, cIdx) => (
+                                                        <div key={col} className="col-v4">
+                                                            <div className="header-v4" style={{ backgroundColor: getBallColor(cIdx * 15 + 1) }}>{col}</div>
+                                                            {(w.officialCard?.[col] || []).map((num, i) => {
+                                                                const isMarked = gameState.calledNumbers.includes(num) || num === 'FREE';
+                                                                return (
+                                                                    <div key={i} className={`cell-v4 ${isMarked ? 'marked' : ''}`}>
+                                                                        {num === 'FREE' ? '✨' : num}
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    ))}
+                                                </div>
                                             </div>
-                                        </div>
 
-                                        <div className="prize-pill-v4">
-                                            <span className="p-lbl">PRIZE:</span> {w.prize || 0} <small>Birr</small>
-                                        </div>
+                                            <motion.div
+                                                className="prize-pill-v4"
+                                                initial={{ scale: 0.8, opacity: 0 }}
+                                                animate={{ scale: 1, opacity: 1 }}
+                                                transition={{ delay: 0.6 + idx * 0.1 }}
+                                            >
+                                                <span className="p-lbl">PRIZE:</span> {w.prize || 0} <small>Birr</small>
+                                            </motion.div>
 
-                                        {idx < (Array.isArray(winner) ? winner.length : 1) - 1 && <div className="winner-sep-v4" />}
-                                    </div>
-                                );
-                            })}
-                        </div>
+                                            {idx < (Array.isArray(winner) ? winner.length : 1) - 1 && <div className="winner-sep-v4" />}
+                                        </motion.div>
+                                    );
+                                })}
+                            </div>
 
-                        <div className="auto-start-pill-v4">
-                            <div className="dot-v4 pulsing"></div>
-                            Auto-starting next game in {gameState.resetIn || 0}s
-                        </div>
+                            <motion.div
+                                className="auto-start-pill-v4"
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.7 }}
+                            >
+                                <div className="dot-v4 pulsing"></div>
+                                Auto-starting next game in {gameState.resetIn || 0}s
+                            </motion.div>
 
-                        <button className="prestige-continue-btn" onClick={() => onGameOver()}>
-                            CONTINUE
-                        </button>
-                    </div>
-                </div>
-            )}
+                            <motion.button
+                                className="prestige-continue-btn"
+                                onClick={() => onGameOver()}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.8 }}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                            >
+                                CONTINUE
+                            </motion.button>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

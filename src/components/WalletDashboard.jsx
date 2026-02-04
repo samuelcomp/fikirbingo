@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { Wallet, CheckCircle, RotateCcw, Coins, ArrowRightLeft, ArrowDownLeft, ArrowUpRight, Clock, XCircle, AlertCircle, Receipt } from 'lucide-react';
 
@@ -51,21 +52,6 @@ const WalletDashboard = ({ user, onUpdateUser, t }) => {
         }
     };
 
-    const getStatusIcon = (status) => {
-        switch (status) {
-            case 'APPROVED': return <CheckCircle size={16} className="status-icon approved" />;
-            case 'REJECTED': return <XCircle size={16} className="status-icon rejected" />;
-            case 'PENDING': return <Clock size={16} className="status-icon pending" />;
-            default: return <AlertCircle size={16} className="status-icon" />;
-        }
-    };
-
-    const getTypeIcon = (type) => {
-        return type === 'DEPOSIT'
-            ? <ArrowDownLeft size={18} className="type-icon deposit" />
-            : <ArrowUpRight size={18} className="type-icon withdraw" />;
-    };
-
     const filteredTransactions = transactions.filter(tx => {
         if (filter === 'all') return true;
         if (filter === 'deposit') return tx.type === 'DEPOSIT';
@@ -74,9 +60,9 @@ const WalletDashboard = ({ user, onUpdateUser, t }) => {
     });
 
     return (
-        <div className="wallet-simple-page">
-            <header className="wallet-simple-header">
-                <h1 className="page-title">Wallet</h1>
+        <div className="wallet-page-v4">
+            <header className="wallet-header-v4">
+                <h1 className="wallet-title-v4">My Wallet</h1>
                 <button
                     className="refresh-btn-v3"
                     onClick={handleRefresh}
@@ -86,128 +72,133 @@ const WalletDashboard = ({ user, onUpdateUser, t }) => {
                 </button>
             </header>
 
-            {/* Smart Tabs */}
-            <div className="wallet-tabs-container">
+            <div className="wallet-tabs-v4">
                 <button
-                    className={`wallet-tab ${activeTab === 'balance' ? 'active' : ''}`}
+                    className={`tab-btn-v4 ${activeTab === 'balance' ? 'active' : ''}`}
                     onClick={() => setActiveTab('balance')}
                 >
-                    <Wallet size={16} />
-                    <span>Balance</span>
+                    <Wallet size={18} /> Balance
                 </button>
                 <button
-                    className={`wallet-tab ${activeTab === 'transactions' ? 'active' : ''}`}
+                    className={`tab-btn-v4 ${activeTab === 'transactions' ? 'active' : ''}`}
                     onClick={() => setActiveTab('transactions')}
                 >
-                    <Receipt size={16} />
-                    <span>History</span>
+                    <Receipt size={18} /> History
                 </button>
             </div>
 
-            {activeTab === 'balance' ? (
-                /* BALANCE VIEW */
-                <div className="balance-view fade-in">
-                    <div className="user-info-card">
-                        <div className="user-icon-wrapper">
-                            <Wallet size={20} />
+            <AnimatePresence mode="wait">
+                {activeTab === 'balance' ? (
+                    <motion.div
+                        key="balance"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 20 }}
+                        transition={{ duration: 0.3 }}
+                        className="balance-section"
+                    >
+                        <div className="balance-cards-grid-v4">
+                            <motion.div
+                                className="balance-card-v4 main"
+                                whileHover={{ scale: 1.02 }}
+                                transition={{ type: "spring", stiffness: 300 }}
+                            >
+                                <div className="card-icon-circle">
+                                    <Wallet />
+                                </div>
+                                <div className="card-label-v4">Main Balance</div>
+                                <div className="card-amount-v4">
+                                    {user?.mainBalance || 0} <span>Birr</span>
+                                </div>
+                            </motion.div>
+
+                            <motion.div
+                                className="balance-card-v4 play"
+                                whileHover={{ scale: 1.02 }}
+                                transition={{ type: "spring", stiffness: 300 }}
+                            >
+                                <div className="card-icon-circle">
+                                    <ArrowRightLeft />
+                                </div>
+                                <div className="card-label-v4">Play Wallet</div>
+                                <div className="card-amount-v4">
+                                    {user?.playBalance || 0} <span>Birr</span>
+                                </div>
+                            </motion.div>
+
+                            <motion.div
+                                className="balance-card-v4 coins"
+                                whileHover={{ scale: 1.02 }}
+                                transition={{ type: "spring", stiffness: 300 }}
+                            >
+                                <div className="card-icon-circle">
+                                    <Coins />
+                                </div>
+                                <div className="card-label-v4">Loyalty Coins</div>
+                                <div className="card-amount-v4">
+                                    {user?.loyaltyCoins || 0} <span>Coins</span>
+                                </div>
+                            </motion.div>
                         </div>
-                        <span className="user-phone">{user?.phoneNumber || '0900000000'}</span>
-                        <div className="verified-badge">
-                            <CheckCircle size={14} />
-                            <span>Verified</span>
-                        </div>
-                    </div>
-
-                    <div className="balance-cards-grid">
-                        <div className="balance-card-simple main-wallet">
-                            <div className="card-header">
-                                <Wallet size={18} />
-                                <span className="card-label">Main Wallet</span>
-                            </div>
-                            <div className="card-value">
-                                <span className="amount">{user?.mainBalance || 0}</span>
-                                <span className="currency">Birr</span>
-                            </div>
+                    </motion.div>
+                ) : (
+                    <motion.div
+                        key="history"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ duration: 0.3 }}
+                        className="history-section"
+                    >
+                        <div className="transaction-filters" style={{ marginBottom: '16px' }}>
+                            <button className={`filter-btn ${filter === 'all' ? 'active' : ''}`} onClick={() => setFilter('all')}>All</button>
+                            <button className={`filter-btn ${filter === 'deposit' ? 'active' : ''}`} onClick={() => setFilter('deposit')}>In</button>
+                            <button className={`filter-btn ${filter === 'withdraw' ? 'active' : ''}`} onClick={() => setFilter('withdraw')}>Out</button>
                         </div>
 
-                        <div className="balance-card-simple play-wallet">
-                            <div className="card-header">
-                                <ArrowRightLeft size={18} />
-                                <span className="card-label">Play Wallet</span>
-                            </div>
-                            <div className="card-value">
-                                <span className="amount">{user?.playBalance || 0}</span>
-                                <span className="currency">Birr</span>
-                            </div>
-                        </div>
-
-                        <div className="balance-card-simple loyalty-coins">
-                            <div className="card-header">
-                                <Coins size={18} />
-                                <span className="card-label">Loyalty Coins</span>
-                            </div>
-                            <div className="card-value">
-                                <span className="amount">{user?.loyaltyCoins || 0}</span>
-                                <span className="currency">Coins</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="wallet-info-text">
-                        <p>Your wallet balances are updated in real-time.</p>
-                        <p>Switch to the <b>History</b> tab to view past transactions.</p>
-                    </div>
-                </div>
-            ) : (
-                /* TRANSACTIONS VIEW */
-                <div className="transactions-view fade-in">
-                    <div className="transaction-filters">
-                        <button className={`filter-btn ${filter === 'all' ? 'active' : ''}`} onClick={() => setFilter('all')}>All</button>
-                        <button className={`filter-btn ${filter === 'deposit' ? 'active' : ''}`} onClick={() => setFilter('deposit')}>Deposits</button>
-                        <button className={`filter-btn ${filter === 'withdraw' ? 'active' : ''}`} onClick={() => setFilter('withdraw')}>Withdrawals</button>
-                    </div>
-
-                    <div className="transactions-list">
-                        {isLoadingTx ? (
-                            <div className="loading-state-simple">
-                                <p>Loading history...</p>
-                            </div>
-                        ) : filteredTransactions.length === 0 ? (
-                            <div className="empty-state-simple">
-                                <AlertCircle size={32} />
-                                <p>No {filter !== 'all' ? filter : ''} transactions found.</p>
-                            </div>
-                        ) : (
-                            filteredTransactions.map((tx, idx) => (
-                                <div key={idx} className="transaction-card-v3">
-                                    <div className="tx-icon-wrapper">
-                                        {getTypeIcon(tx.type)}
-                                    </div>
-
-                                    <div className="tx-details">
-                                        <div className="tx-main">
-                                            <span className="tx-type">{tx.type}</span>
-                                            <span className="tx-amount">{tx.amount} Birr</span>
+                        <div className="tx-list-v4">
+                            {isLoadingTx ? (
+                                <div className="loading-state-simple">Loading...</div>
+                            ) : filteredTransactions.length === 0 ? (
+                                <div className="empty-state-simple" style={{ textAlign: 'center', padding: '40px', color: 'rgba(255,255,255,0.5)' }}>
+                                    <Receipt size={48} style={{ marginBottom: '16px', opacity: 0.5 }} />
+                                    <p>No transactions found</p>
+                                </div>
+                            ) : (
+                                filteredTransactions.map((tx, idx) => (
+                                    <motion.div
+                                        key={idx}
+                                        className="tx-item-v4"
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: idx * 0.05 }}
+                                    >
+                                        <div className={`tx-icon-v4 ${tx.type === 'DEPOSIT' ? 'deposit' : 'withdraw'}`}>
+                                            {tx.type === 'DEPOSIT' ? <ArrowDownLeft size={20} /> : <ArrowUpRight size={20} />}
                                         </div>
-                                        <div className="tx-meta">
-                                            <span className="tx-ref">Ref: {tx.reference || 'N/A'}</span>
-                                            <span className="tx-date">
+                                        <div className="tx-info-v4">
+                                            <span className="tx-type-v4">{tx.type}</span>
+                                            <span className="tx-date-v4">
                                                 {new Date(tx.createdAt).toLocaleString('en-US', {
                                                     month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
                                                 })}
                                             </span>
                                         </div>
-                                    </div>
-
-                                    <div className="tx-status-wrapper">
-                                        {getStatusIcon(tx.status)}
-                                    </div>
-                                </div>
-                            ))
-                        )}
-                    </div>
-                </div>
-            )}
+                                        <div className="tx-right-v4">
+                                            <div className={`tx-amount-v4 ${tx.type === 'DEPOSIT' ? 'deposit' : 'withdraw'}`}>
+                                                {tx.type === 'DEPOSIT' ? '+' : '-'}{tx.amount}
+                                            </div>
+                                            <span className={`status-badge-v4 ${tx.status.toLowerCase()}`}>
+                                                {tx.status}
+                                            </span>
+                                        </div>
+                                    </motion.div>
+                                ))
+                            )}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

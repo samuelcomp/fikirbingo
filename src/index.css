@@ -5794,3 +5794,208 @@ input:checked+.slider-v3:before {
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
 }
 
+
+/* PREMIUM WALLET DASHBOARD V4 */
+.wallet-page-v4 {
+  padding: 20px;
+  padding-bottom: 100px;
+  min-height: 100vh;
+  background: var(--bg-dark);
+  color: white;
+}
+
+.wallet-header-v4 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.wallet-title-v4 {
+  font-size: 28px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #fff 0%, #a855f7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 1px;
+}
+
+/* Wallet Cards */
+.balance-cards-grid-v4 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.balance-card-v4 {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.balance-card-v4:hover {
+  transform: translateY(-5px);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.balance-card-v4.main {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(236, 72, 153, 0.05));
+  border-color: rgba(168, 85, 247, 0.3);
+}
+
+.balance-card-v4.play {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(6, 182, 212, 0.05));
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.balance-card-v4.coins {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(251, 191, 36, 0.05));
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.card-icon-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 16px;
+  font-size: 24px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.balance-card-v4.main .card-icon-circle { background: rgba(168, 85, 247, 0.2); color: #a855f7; }
+.balance-card-v4.play .card-icon-circle { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+.balance-card-v4.coins .card-icon-circle { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+
+.card-label-v4 {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 4px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.card-amount-v4 {
+  font-size: 32px;
+  font-weight: 800;
+  color: white;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.card-amount-v4 span {
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Tabs */
+.wallet-tabs-v4 {
+  display: flex;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px;
+  border-radius: 16px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tab-btn-v4 {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.tab-btn-v4.active {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Transactions */
+.tx-list-v4 {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tx-item-v4 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  transition: all 0.2s ease;
+}
+
+.tx-item-v4:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.tx-icon-v4 {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+}
+
+.tx-icon-v4.deposit { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+.tx-icon-v4.withdraw { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+
+.tx-info-v4 {
+  flex: 1;
+}
+
+.tx-type-v4 { font-weight: 700; color: white; display: block; margin-bottom: 2px; }
+.tx-date-v4 { font-size: 11px; color: rgba(255, 255, 255, 0.4); }
+
+.tx-amount-v4 {
+  font-weight: 800;
+  font-size: 16px;
+  text-align: right;
+}
+
+.tx-amount-v4.deposit { color: #10b981; }
+.tx-amount-v4.withdraw { color: white; }
+
+.status-badge-v4 {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-top: 4px;
+  display: inline-block;
+  text-transform: uppercase;
+  font-weight: 700;
+  float: right;
+  clear: both;
+}
+
+.status-badge-v4.approved { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+.status-badge-v4.pending { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+.status-badge-v4.rejected { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+
