@@ -1044,3 +1044,37 @@ input:checked+.slider-v3:before {
     max-height: none !important;
 }
 
+
+/* STRICT DASHBOARD LAYOUT */
+.game-view-v3 {
+    height: 100vh;
+    min-height: 0;
+    overflow: hidden;
+    padding-bottom: 0;
+}
+
+.game-body-v3 {
+    flex: 1;
+    min-height: 0; /* Crucial for nested flex scrolling */
+    overflow: hidden;
+}
+
+.left-game-column {
+    height: 100%;
+    overflow: hidden;
+}
+
+.bingo-sidebar-v3 {
+    overflow-y: auto !important;
+    flex: 1;
+    border-top: 1px solid var(--glass-border);
+    padding-top: 12px;
+    margin-top: 12px;
+}
+
+.game-main-v3 {
+    height: 100%;
+    overflow-y: auto;
+    padding-bottom: 120px; /* Space for fixed/overlay buttons if any */
+}
+
