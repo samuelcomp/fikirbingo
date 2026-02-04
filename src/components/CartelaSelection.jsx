@@ -309,7 +309,7 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, onUpdateUser, t }) =>
         );
     };
 
-    const selectionProgress = (selectedIds.length / 2) * 100;
+    const selectionProgress = (selectedIds.length / maxCartelas) * 100;
 
     return (
         <div className="lobby-container-v3">
@@ -372,20 +372,20 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, onUpdateUser, t }) =>
                 <div className="progress-info-enhanced">
                     <motion.span
                         className="progress-title"
-                        animate={{ scale: selectedIds.length === 2 ? [1, 1.05, 1] : 1 }}
+                        animate={{ scale: selectedIds.length === maxCartelas ? [1, 1.05, 1] : 1 }}
                         transition={{ duration: 0.5 }}
                     >
-                        Select 2 Cartelas to Play
+                        Select {maxCartelas} Cartela{maxCartelas > 1 ? 's' : ''} to Play
                     </motion.span>
                     <motion.span
-                        className={`progress-count ${selectedIds.length === 2 ? 'ready' : ''}`}
+                        className={`progress-count ${selectedIds.length === maxCartelas ? 'ready' : ''}`}
                         animate={{
-                            scale: selectedIds.length === 2 ? [1, 1.2, 1] : 1,
-                            color: selectedIds.length === 2 ? ['#10b981', '#34d399', '#10b981'] : '#9ca3af'
+                            scale: selectedIds.length === maxCartelas ? [1, 1.2, 1] : 1,
+                            color: selectedIds.length === maxCartelas ? ['#10b981', '#34d399', '#10b981'] : '#9ca3af'
                         }}
                         transition={{ duration: 0.6 }}
                     >
-                        {selectedIds.length}/2 {selectedIds.length === 2 && '✅'}
+                        {selectedIds.length}/{maxCartelas} {selectedIds.length === maxCartelas && '✅'}
                     </motion.span>
                 </div>
                 <div className="progress-track-enhanced">
@@ -437,8 +437,8 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, onUpdateUser, t }) =>
                     </button>
                 ) : (
                     <div className="lobby-action-info">
-                        {selectedIds.length < 2 ? (
-                            <p className="hint-text">Select {2 - selectedIds.length} more to play</p>
+                        {selectedIds.length < maxCartelas ? (
+                            <p className="hint-text">Select {maxCartelas - selectedIds.length} more to play</p>
                         ) : (
                             <p className="success-text">Waiting for game to start... ⏳</p>
                         )}
