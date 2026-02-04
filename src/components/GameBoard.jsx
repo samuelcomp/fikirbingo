@@ -219,11 +219,21 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                     <div className="sidebar-header-label-v3">RECENT</div>
                     <div className="top-feedback-v3">
                         <div className="recent-draws-v3">
-                            {gameState.calledNumbers.slice(-3).reverse().map((num, i) => (
-                                <div key={i} className="recent-ball-v3" style={{ backgroundColor: getBallColor(num) }}>
-                                    {getBallLetter(num)}-{num}
-                                </div>
-                            ))}
+                            <AnimatePresence>
+                                {gameState.calledNumbers.slice(-3).reverse().map((num, i) => (
+                                    <motion.div
+                                        key={num}
+                                        className="recent-ball-v3"
+                                        initial={{ x: 20, opacity: 0, scale: 0.5 }}
+                                        animate={{ x: 0, opacity: 1, scale: 1 }}
+                                        exit={{ x: -20, opacity: 0, scale: 0.5 }}
+                                        transition={{ type: 'spring', damping: 15, stiffness: 200 }}
+                                        style={{ backgroundColor: getBallColor(num) }}
+                                    >
+                                        {getBallLetter(num)}-{num}
+                                    </motion.div>
+                                ))}
+                            </AnimatePresence>
                         </div>
                     </div>
 

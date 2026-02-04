@@ -178,15 +178,21 @@
 .recent-ball-v3 {
     flex: 0 0 32px;
     height: 32px;
-    border-radius: 50%;
-    font-size: 10px;
+    border-radius: 50% !important;
+    font-size: 9px;
     font-weight: 900;
     color: white;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4) 0%, transparent 45%),
+        radial-gradient(circle at 70% 70%, rgba(0, 0, 0, 0.3) 0%, transparent 60%),
+        var(--ball-color, var(--bg-card));
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.3),
+        inset 0 2px 4px rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .icon-btn-v3 {
