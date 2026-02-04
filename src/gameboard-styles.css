@@ -987,3 +987,42 @@ input:checked+.slider-v3:before {
     width: 100%;
 }
 
+
+/* 3-COLUMN LAYOUT UPDATE */
+.game-info-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 200px;
+    min-width: 200px;
+}
+
+.bingo-sidebar-v3 {
+    width: 170px;
+    min-width: 170px;
+    max-height: none !important;
+    overflow-y: visible !important;
+}
+
+/* Restore left-game-column just in case, but we aren't using it now */
+
+
+/* MOBILE RESPONSIVE UPDATE FOR 3-COL */
+@media (max-width: 900px) {
+    .game-body-v3 {
+        flex-direction: column;
+    }
+    .game-info-sidebar, .bingo-sidebar-v3 {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        overflow-y: visible;
+        min-height: auto;
+    }
+    /* Adjust Sidebar Grid for horizontal layout */
+    .sidebar-col-v3 {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+}
+
