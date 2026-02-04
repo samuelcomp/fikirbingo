@@ -206,24 +206,7 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
             </header>
 
             <div className="game-body-v3">
-                <aside className="bingo-sidebar-v3">
-                    {['B', 'I', 'N', 'G', 'O'].map((letter, colIndex) => (
-                        <div key={letter} className="sidebar-col-v3">
-                            <div className="sidebar-letter-v3" style={{ backgroundColor: getBallColor(colIndex * 15 + 1) }}>{letter}</div>
-                            {Array.from({ length: 15 }, (_, i) => i + 1 + colIndex * 15).map(num => (
-                                <div
-                                    key={num}
-                                    className={`sidebar-num-v3 ${gameState.calledNumbers.includes(num) ? 'called' : ''} ${currentBall === num ? 'active' : ''}`}
-                                    style={{ '--accent': getBallColor(num) }}
-                                >
-                                    {num}
-                                </div>
-                            ))}
-                        </div>
-                    ))}
-                </aside>
-
-                <main className="game-main-v3">
+                <aside className="left-game-column">
                     <div className="top-feedback-v3">
                         <div className="recent-draws-v3">
                             {gameState.calledNumbers.slice(-3).reverse().map((num, i) => (
@@ -271,6 +254,25 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                         </AnimatePresence>
                     </div>
 
+                    <div className="bingo-sidebar-v3">
+                        {['B', 'I', 'N', 'G', 'O'].map((letter, colIndex) => (
+                            <div key={letter} className="sidebar-col-v3">
+                                <div className="sidebar-letter-v3" style={{ backgroundColor: getBallColor(colIndex * 15 + 1) }}>{letter}</div>
+                                {Array.from({ length: 15 }, (_, i) => i + 1 + colIndex * 15).map(num => (
+                                    <div
+                                        key={num}
+                                        className={`sidebar-num-v3 ${gameState.calledNumbers.includes(num) ? 'called' : ''} ${currentBall === num ? 'active' : ''}`}
+                                        style={{ '--accent': getBallColor(num) }}
+                                    >
+                                        {num}
+                                    </div>
+                                ))}
+                            </div>
+                        ))}
+                    </div>
+                </aside>
+
+                <main className="game-main-v3">
                     <div className="cards-stack-v3">
                         {isWatcher ? (
                             <div className="watcher-card-v3 upscale-reveal">
