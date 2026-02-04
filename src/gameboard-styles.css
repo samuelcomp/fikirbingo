@@ -1078,3 +1078,25 @@ input:checked+.slider-v3:before {
     padding-bottom: 120px; /* Space for fixed/overlay buttons if any */
 }
 
+
+/* FIX MOBILE SCROLLING */
+@media (max-width: 900px) {
+    .game-view-v3 {
+        height: auto !important;
+        min-height: 100vh;
+        overflow-y: auto !important;
+    }
+    .game-body-v3 {
+        overflow: visible !important;
+        flex: none;
+    }
+    .left-game-column {
+        height: auto !important;
+        overflow: visible !important;
+    }
+    .game-main-v3 {
+        overflow: visible !important;
+        height: auto !important;
+    }
+}
+
