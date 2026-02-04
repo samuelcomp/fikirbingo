@@ -203,10 +203,14 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                     <span className="pill-title">Called</span>
                     <span className="pill-val">{gameState.calledNumbers.length}</span>
                 </div>
+                <button className="voice-header-btn-v3" onClick={() => setIsVoiceEnabled(!isVoiceEnabled)}>
+                    {isVoiceEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
+                </button>
             </header>
 
             <div className="game-body-v3">
                 <aside className="left-game-column">
+                    <div className="sidebar-header-label-v3">RECENT</div>
                     <div className="top-feedback-v3">
                         <div className="recent-draws-v3">
                             {gameState.calledNumbers.slice(-3).reverse().map((num, i) => (
@@ -215,9 +219,6 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                                 </div>
                             ))}
                         </div>
-                        <button className="icon-btn-v3" onClick={() => setIsVoiceEnabled(!isVoiceEnabled)}>
-                            {isVoiceEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
-                        </button>
                     </div>
 
                     <div className="current-ball-v3">
