@@ -271,14 +271,6 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                         </AnimatePresence>
                     </div>
 
-                    <div className="auto-toggle-row-v3">
-                        <span className="toggle-label-v3">Automatic</span>
-                        <label className="switch-v3">
-                            <input type="checkbox" checked={isAutomatic} onChange={() => setIsAutomatic(!isAutomatic)} />
-                            <span className="slider-v3 round"></span>
-                        </label>
-                    </div>
-
                     <div className="cards-stack-v3">
                         {isWatcher ? (
                             <div className="watcher-card-v3 upscale-reveal">
@@ -301,19 +293,6 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
             <footer className="game-footer-v3">
                 <button className="action-btn-v3 leave" onClick={() => onGameOver()}>Leave</button>
                 <button className="action-btn-v3 refresh" onClick={() => window.location.reload()}>Refresh</button>
-                <button
-                    className={`action-btn-v3 automatic ${isAutomatic ? 'active' : 'claim'}`}
-                    disabled={isWatcher}
-                    onClick={() => {
-                        if (!isAutomatic) {
-                            selectedCartelas.forEach(card => {
-                                socket?.emit('claim_win', { roomId, cartelaId: card.id });
-                            });
-                        }
-                    }}
-                >
-                    {isAutomatic ? 'Automatic' : 'CLAIM BINGO!'}
-                </button>
             </footer>
 
             {/* Winner Overlay - High Fidelity Restoration with Crash Protection */}

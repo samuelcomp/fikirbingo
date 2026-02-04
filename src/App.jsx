@@ -129,15 +129,57 @@ function App() {
         return (
             <div className="loading-screen premium-loader">
                 <div className="loader-glitch-container">
-                    <div className="loader-logo-circle">
+                    <motion.div
+                        className="loader-logo-circle"
+                        animate={{
+                            scale: [1, 1.1, 1],
+                            rotate: [0, 360]
+                        }}
+                        transition={{
+                            duration: 2,
+                            repeat: Infinity,
+                            ease: "easeInOut"
+                        }}
+                    >
                         <Gamepad2 size={60} className="floating-logo" />
-                    </div>
+                    </motion.div>
                     <div className="loader-content">
-                        <h1 className="loader-title">Beteseb Bingo</h1>
+                        <motion.h1
+                            className="loader-title amharic-title"
+                            initial={{ opacity: 0, y: -20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6 }}
+                        >
+                            ፍቅር ቢንጎ
+                        </motion.h1>
+                        <motion.h2
+                            className="loader-subtitle"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.3, duration: 0.6 }}
+                        >
+                            Fikir Bingo
+                        </motion.h2>
                         <div className="loader-progress-bar">
-                            <div className="loader-progress-shimmer"></div>
+                            <motion.div
+                                className="loader-progress-shimmer"
+                                animate={{
+                                    x: ['-100%', '200%']
+                                }}
+                                transition={{
+                                    duration: 1.5,
+                                    repeat: Infinity,
+                                    ease: "easeInOut"
+                                }}
+                            ></motion.div>
                         </div>
-                        <p className="loader-status">Initializing Game Experience...</p>
+                        <motion.p
+                            className="loader-status"
+                            animate={{ opacity: [0.5, 1, 0.5] }}
+                            transition={{ duration: 2, repeat: Infinity }}
+                        >
+                            Initializing Game Experience...
+                        </motion.p>
                     </div>
                 </div>
             </div>

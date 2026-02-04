@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { io } from 'socket.io-client';
 import { ChevronLeft, RotateCcw, MonitorPlay, Check, Loader2, AlertCircle } from 'lucide-react';
 
@@ -334,23 +335,22 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, onUpdateUser, t }) =>
                 </button>
             </header>
 
-            <div className="lobby-status-grid">
-                <div className="status-box">
-                    <span className="box-label">Main Wallet</span>
-                    <span className="box-value">{localBalances.main}</span>
+            <div className="lobby-status-grid-compact">
+                <div className="status-box-compact">
+                    <span className="box-label-compact">Wallet</span>
+                    <span className="box-value-compact">{localBalances.main} Birr</span>
                 </div>
-                {/* Play Wallet Removed */}
-                <div className="status-box">
-                    <span className="box-label">Stake (Per Card)</span>
-                    <span className="box-value">{stake}</span>
+                <div className="status-box-compact">
+                    <span className="box-label-compact">Stake</span>
+                    <span className="box-value-compact">{stake}</span>
                 </div>
-                <div className="status-box highlight-purple">
-                    <span className="box-label">Total Bet</span>
-                    <span className="box-value">{stake * selectedIds.length} <small>Birr</small></span>
+                <div className="status-box-compact highlight-purple">
+                    <span className="box-label-compact">Bet</span>
+                    <span className="box-value-compact">{stake * selectedIds.length}</span>
                 </div>
-                <div className="status-box highlight">
-                    <span className="box-label">Prize Pool</span>
-                    <span className="box-value">{prizePool} <small>Birr</small></span>
+                <div className="status-box-compact highlight">
+                    <span className="box-label-compact">Prize</span>
+                    <span className="box-value-compact">{prizePool}</span>
                 </div>
             </div>
 
@@ -363,17 +363,46 @@ const CartelaSelection = ({ user, stake = 10, onGameStart, onUpdateUser, t }) =>
 
             {/* Banner Removed - Clean slate immediately */}
 
-            <div className="selection-progress-bar">
-                <div className="progress-info">
-                    <span>Select 2 Cartelas to Play</span>
-                    <span className={selectedIds.length === 2 ? 'ready' : ''}>
-                        {selectedIds.length}/2 {selectedIds.length === 2 && 'Ready! ✅'}
-                    </span>
+            <motion.div
+                className="selection-progress-container"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+            >
+                <div className="progress-info-enhanced">
+                    <motion.span
+                        className="progress-title"
+                        animate={{ scale: selectedIds.length === 2 ? [1, 1.05, 1] : 1 }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        Select 2 Cartelas to Play
+                    </motion.span>
+                    <motion.span
+                        className={`progress-count ${selectedIds.length === 2 ? 'ready' : ''}`}
+                        animate={{
+                            scale: selectedIds.length === 2 ? [1, 1.2, 1] : 1,
+                            color: selectedIds.length === 2 ? ['#10b981', '#34d399', '#10b981'] : '#9ca3af'
+                        }}
+                        transition={{ duration: 0.6 }}
+                    >
+                        {selectedIds.length}/2 {selectedIds.length === 2 && '✅'}
+                    </motion.span>
                 </div>
-                <div className="progress-track">
-                    <div className="progress-fill" style={{ width: `${selectionProgress}%` }}></div>
+                <div className="progress-track-enhanced">
+                    <motion.div
+                        className="progress-fill-enhanced"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${selectionProgress}%` }}
+                        transition={{ type: "spring", stiffness: 100, damping: 15 }}
+                    >
+                        <motion.div
+                            className="progress-shimmer"
+                            animate={{ x: ['-100%', '200%'] }}
+                            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                        />
+                    </motion.div>
                 </div>
-            </div>
+            </motion.div>
 
             <main className="lobby-main-grid-area">
                 <div className="cartela-chips-scroll">
