@@ -964,8 +964,11 @@ input:checked+.slider-v3:before {
         background: rgba(10, 10, 20, 0.4);
         display: flex;
         flex-direction: column;
-        gap: 2px !important;
-        /* Extremely tight gap */
+        gap: 0 !important;
+        /* No gap, use margins */
+        justify-content: flex-start !important;
+        /* Force top alignment */
+        align-items: center !important;
     }
 
     .top-feedback-v3 {
@@ -986,20 +989,25 @@ input:checked+.slider-v3:before {
         height: min-content !important;
         min-height: 0 !important;
         padding: 0 !important;
-        margin: 0 !important;
+        margin: 3px 0 !important;
+        /* User requested 3px */
         background: transparent !important;
         border: none !important;
         box-shadow: none !important;
         display: flex;
         justify-content: center;
         align-items: center;
+        width: 100%;
     }
 
     .focus-ball-v3 {
         width: 64px !important;
         height: 64px !important;
         margin: 0 auto !important;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+        background: var(--bg-card) !important;
+        /* Solid background to remove radial bubble */
+        border: 4px solid var(--secondary) !important;
     }
 
     .focus-val-v3 {
