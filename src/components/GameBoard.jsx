@@ -203,9 +203,11 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                     <span className="pill-title">Called</span>
                     <span className="pill-val">{gameState.calledNumbers.length}</span>
                 </div>
-                <button className="voice-header-btn-v3" onClick={() => setIsVoiceEnabled(!isVoiceEnabled)}>
-                    {isVoiceEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
-                </button>
+                <div className="voice-control-wrapper-v3">
+                    <button className="voice-header-btn-v3" onClick={() => setIsVoiceEnabled(!isVoiceEnabled)}>
+                        {isVoiceEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
+                    </button>
+                </div>
             </header>
 
             <div className="game-body-v3">
@@ -236,7 +238,10 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                                         mass: 1
                                     }}
                                     className="focus-ball-v3"
-                                    style={{ borderColor: getBallColor(currentBall) }}
+                                    style={{
+                                        borderColor: getBallColor(currentBall),
+                                        '--ball-color': getBallColor(currentBall)
+                                    }}
                                 >
                                     <div className="focus-letter-v3">{getBallLetter(currentBall)}</div>
                                     <div className="focus-val-v3">{currentBall}</div>
