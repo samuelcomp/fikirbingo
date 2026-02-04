@@ -1045,51 +1045,60 @@ input:checked+.slider-v3:before {
         padding-bottom: 120px;
     }
 
-    /* Current Ball Scale Down */
+    /* Current Ball Compact Mode */
     .current-ball-v3 {
         min-height: auto;
-        padding: 8px;
+        padding: 0 !important;
+        margin: 0 !important;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
     .focus-ball-v3 {
-        width: 70px !important;
-        height: 70px !important;
+        width: 60px !important;
+        height: 60px !important;
+        margin: 4px auto !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
 
     .focus-val-v3 {
-        font-size: 28px !important;
+        font-size: 24px !important;
     }
 
-    /* Grid Adjustment */
+    /* Grid Adjustment - Tighter */
     .bingo-sidebar-v3 {
         width: 100% !important;
         flex: 1;
-        justify-content: space-between;
-        padding: 0 4px;
+        justify-content: flex-start;
+        padding: 0 2px;
+        gap: 2px;
         overflow-y: auto !important;
     }
 
     .sidebar-col-v3 {
         flex: 1;
-        min-width: 20px;
+        min-width: 18px;
         flex-direction: column !important;
+        gap: 1px !important;
     }
 
     .sidebar-letter-v3 {
-        font-size: 9px !important;
-        padding: 4px 0 !important;
+        font-size: 8px !important;
+        padding: 2px 0 !important;
     }
 
     .sidebar-num-v3 {
-        font-size: 9px !important;
-        padding: 4px 0 !important;
-        margin-bottom: 2px;
+        font-size: 8px !important;
+        padding: 2px 0 !important;
+        margin-bottom: 1px;
     }
 
-    /* Cartelas */
+    /* Cartelas - Maximize Space */
     .cards-stack-v3 {
         grid-template-columns: 1fr !important;
-        padding: 12px;
-        gap: 20px;
+        padding: 4px !important;
+        gap: 8px !important;
+        width: 100% !important;
     }
 }
