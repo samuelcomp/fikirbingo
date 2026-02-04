@@ -909,7 +909,7 @@ input:checked+.slider-v3:before {
 }
 
 
-/* LEFT COLUMN LAYOUT ADJUSTMENTS */
+/* SIDEBAR CLEANUP */
 .left-game-column {
     display: flex;
     flex-direction: column;
@@ -918,114 +918,11 @@ input:checked+.slider-v3:before {
     min-width: 260px;
 }
 
-/* Make sidebar fill available vertical space */
 .bingo-sidebar-v3 {
     flex: 1;
     max-height: none !important;
-    min-height: 200px;
     overflow-y: auto;
 }
-
-/* Adjust Top Feedback for Narrow Column */
-.top-feedback-v3 {
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 8px;
-    padding: 0;
-}
-
-.recent-draws-v3 {
-    flex: 1;
-    justify-content: center;
-}
-
-/* Adjust Current Ball container for sidebar width */
-.current-ball-v3 {
-    min-height: auto !important;
-    padding: 16px !important;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.focus-ball-v3 {
-    width: 100px !important;
-    height: 100px !important;
-}
-
-.focus-val-v3 {
-    font-size: 42px !important;
-}
-
-.focus-letter-v3 {
-    font-size: 14px !important;
-}
-
-/* Responsive adjustment for Mobile */
-@media (max-width: 768px) {
-    .game-body-v3 {
-        flex-direction: column;
-    }
-
-    .left-game-column {
-        width: 100%;
-        min-width: 0;
-        flex-direction: row;
-        flex-wrap: wrap;
-        align-items: flex-start;
-    }
-
-    .current-ball-v3 {
-        width: auto;
-        flex: 1;
-        min-width: 140px;
-    }
-
-    .top-feedback-v3 {
-        width: 100%;
-        order: -1;
-    }
-
-    .bingo-sidebar-v3 {
-        width: 100%;
-        height: 150px;
-        flex: none;
-    }
-}
-
-/* RIGHT COLUMN SCROLL & GRID */
-.game-main-v3 {
-    overflow-y: auto;
-    padding-right: 4px;
-    padding-bottom: 80px;
-}
-
-.cards-stack-v3 {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 16px;
-    width: 100%;
-}
-
-
-/* 3-COLUMN LAYOUT UPDATE */
-.game-info-sidebar {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    width: 200px;
-    min-width: 200px;
-}
-
-.bingo-sidebar-v3 {
-    width: 170px;
-    min-width: 170px;
-    max-height: none !important;
-    overflow-y: visible !important;
-}
-
-/* Restore left-game-column just in case, but we aren't using it now */
 
 
 /* MOBILE ROBUST LAYOUT FIX */
@@ -1083,18 +980,19 @@ input:checked+.slider-v3:before {
         padding-bottom: 200px !important;
     }
 
-    /* Current Ball Compact Mode - NO BOX */
+    /* Current Ball - ZERO SPACE MODE */
     .current-ball-v3 {
+        flex: none !important;
+        height: min-content !important;
         min-height: 0 !important;
         padding: 0 !important;
         margin: 0 !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
         display: flex;
         justify-content: center;
         align-items: center;
-        background: none !important;
-        border: none !important;
-        /* Removed border */
-        box-shadow: none !important;
     }
 
     .focus-ball-v3 {
