@@ -1042,7 +1042,7 @@ input:checked+.slider-v3:before {
         flex: 1;
         height: 100% !important;
         overflow-y: auto !important;
-        padding-bottom: 120px;
+        padding-bottom: 200px !important;
     }
 
     /* Current Ball Compact Mode */
@@ -1096,9 +1096,18 @@ input:checked+.slider-v3:before {
 
     /* Cartelas - Maximize Space */
     .cards-stack-v3 {
-        grid-template-columns: 1fr !important;
+        display: flex !important;
+        flex-direction: column !important;
+        grid-template-columns: none !important;
+        max-height: none !important;
         padding: 4px !important;
-        gap: 8px !important;
+        gap: 12px !important;
         width: 100% !important;
+    }
+
+    .game-card-v3 {
+        flex-shrink: 0 !important;
+        min-height: min-content !important;
+        overflow: visible !important;
     }
 }
