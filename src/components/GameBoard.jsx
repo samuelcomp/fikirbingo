@@ -206,7 +206,7 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
             </header>
 
             <div className="game-body-v3">
-                <aside className="game-info-sidebar">
+                <aside className="left-game-column">
                     <div className="top-feedback-v3">
                         <div className="recent-draws-v3">
                             {gameState.calledNumbers.slice(-3).reverse().map((num, i) => (
@@ -225,10 +225,15 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                             {currentBall ? (
                                 <motion.div
                                     key={currentBall}
-                                    initial={{ scale: 0.4, opacity: 0, rotate: -180 }}
-                                    animate={{ scale: 1, opacity: 1, rotate: 0 }}
-                                    exit={{ scale: 1.5, opacity: 0, filter: 'blur(10px)' }}
-                                    transition={{ type: 'spring', damping: 12 }}
+                                    initial={{ scale: 2.5, opacity: 0 }}
+                                    animate={{ scale: 1, opacity: 1 }}
+                                    exit={{ scale: 0, opacity: 0 }}
+                                    transition={{
+                                        type: 'spring',
+                                        stiffness: 400,
+                                        damping: 25,
+                                        mass: 0.8
+                                    }}
                                     className="focus-ball-v3 shadow-pulse"
                                     style={{ borderColor: getBallColor(currentBall) }}
                                 >
@@ -236,8 +241,8 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                                     <span className="focus-val-v3">{currentBall}</span>
                                     <motion.div
                                         className="ball-aura"
-                                        animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.4, 0.2] }}
-                                        transition={{ duration: 2, repeat: Infinity }}
+                                        animate={{ scale: [1, 1.4, 1], opacity: [0.3, 0.6, 0.3] }}
+                                        transition={{ duration: 1, repeat: Infinity }}
                                         style={{ backgroundColor: getBallColor(currentBall) }}
                                     />
                                 </motion.div>
@@ -253,23 +258,23 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                             )}
                         </AnimatePresence>
                     </div>
-                </aside>
 
-                <aside className="bingo-sidebar-v3">
-                    {['B', 'I', 'N', 'G', 'O'].map((letter, colIndex) => (
-                        <div key={letter} className="sidebar-col-v3">
-                            <div className="sidebar-letter-v3" style={{ backgroundColor: getBallColor(colIndex * 15 + 1) }}>{letter}</div>
-                            {Array.from({ length: 15 }, (_, i) => i + 1 + colIndex * 15).map(num => (
-                                <div
-                                    key={num}
-                                    className={`sidebar-num-v3 ${gameState.calledNumbers.includes(num) ? 'called' : ''} ${currentBall === num ? 'active' : ''}`}
-                                    style={{ '--accent': getBallColor(num) }}
-                                >
-                                    {num}
-                                </div>
-                            ))}
-                        </div>
-                    ))}
+                    <div className="bingo-sidebar-v3">
+                        {['B', 'I', 'N', 'G', 'O'].map((letter, colIndex) => (
+                            <div key={letter} className="sidebar-col-v3">
+                                <div className="sidebar-letter-v3" style={{ backgroundColor: getBallColor(colIndex * 15 + 1) }}>{letter}</div>
+                                {Array.from({ length: 15 }, (_, i) => i + 1 + colIndex * 15).map(num => (
+                                    <div
+                                        key={num}
+                                        className={`sidebar-num-v3 ${gameState.calledNumbers.includes(num) ? 'called' : ''} ${currentBall === num ? 'active' : ''}`}
+                                        style={{ '--accent': getBallColor(num) }}
+                                    >
+                                        {num}
+                                    </div>
+                                ))}
+                            </div>
+                        ))}
+                    </div>
                 </aside>
 
                 <main className="game-main-v3">
