@@ -235,17 +235,11 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                                         damping: 25,
                                         mass: 0.8
                                     }}
-                                    className="focus-ball-v3 shadow-pulse"
+                                    className="focus-ball-v3"
                                     style={{ borderColor: getBallColor(currentBall) }}
                                 >
                                     <span className="focus-letter-v3" style={{ color: getBallColor(currentBall) }}>{getBallLetter(currentBall)}</span>
                                     <span className="focus-val-v3">{currentBall}</span>
-                                    <motion.div
-                                        className="ball-aura"
-                                        animate={{ scale: [1, 1.4, 1], opacity: [0.3, 0.6, 0.3] }}
-                                        transition={{ duration: 1, repeat: Infinity }}
-                                        style={{ backgroundColor: getBallColor(currentBall) }}
-                                    />
                                 </motion.div>
                             ) : (
                                 <motion.div
