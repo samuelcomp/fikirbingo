@@ -1100,3 +1100,65 @@ input:checked+.slider-v3:before {
     }
 }
 
+
+/* FORCE SIDE-BY-SIDE MOBILE */
+@media (max-width: 900px) {
+    .game-body-v3 {
+        flex-direction: row !important; /* Keep side-by-side */
+        align-items: stretch;
+    }
+    .left-game-column {
+        width: 140px !important; /* Narrower sidebar for mobile */
+        min-width: 140px !important;
+        height: auto !important;
+        overflow-y: visible !important;
+    }
+    /* Shrink ball size for mobile sidebar */
+    .focus-val-v3 { font-size: 32px !important; }
+    .focus-ball-v3 { width: 80px !important; height: 80px !important; }
+    /* Adjust Sidebar Grid for narrow width */
+    .sidebar-col-v3 { flex-direction: column !important; }
+    .sidebar-num-v3 { font-size: 8px !important; padding: 2px !important; }
+    .game-main-v3 {
+        overflow-y: auto !important;
+        height: auto !important;
+        flex: 1;
+    }
+    /* Ensure Cartelas Grid adapts nicely */
+    .cards-stack-v3 {
+        grid-template-columns: 1fr !important; /* Single column of cards if narrow */
+        padding-bottom: 150px;
+    }
+}
+
+
+/* FORCE SIDE-BY-SIDE MOBILE */
+@media (max-width: 900px) {
+    .game-body-v3 {
+        flex-direction: row !important; /* Keep side-by-side */
+        align-items: stretch;
+    }
+    .left-game-column {
+        width: 140px !important; /* Narrower sidebar for mobile */
+        min-width: 140px !important;
+        height: auto !important;
+        overflow-y: visible !important;
+    }
+    /* Shrink ball size for mobile sidebar */
+    .focus-val-v3 { font-size: 32px !important; }
+    .focus-ball-v3 { width: 80px !important; height: 80px !important; }
+    /* Adjust Sidebar Grid for narrow width */
+    .sidebar-col-v3 { flex-direction: column !important; }
+    .sidebar-num-v3 { font-size: 8px !important; padding: 2px !important; }
+    .game-main-v3 {
+        overflow-y: auto !important;
+        height: auto !important;
+        flex: 1;
+    }
+    /* Ensure Cartelas Grid adapts nicely */
+    .cards-stack-v3 {
+        grid-template-columns: 1fr !important; /* Single column of cards if narrow */
+        padding-bottom: 150px;
+    }
+}
+
