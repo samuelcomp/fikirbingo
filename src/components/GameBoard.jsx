@@ -155,6 +155,11 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
         if (!card || !card.numbers) return null;
         return (
             <div key={card.id} className="game-card-v3 upscale-reveal">
+                <div className="card-glass-v3" />
+                <div className="card-header-badge-v3">
+                    <span className="badge-tag">No</span>
+                    <span className="badge-val">{card.id}</span>
+                </div>
                 <div className="bingo-grid-5x5-v3">
                     {['B', 'I', 'N', 'G', 'O'].map((col, idx) => (
                         <div key={col} className="bingo-col-v3">
@@ -175,7 +180,6 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                         </div>
                     ))}
                 </div>
-                <div className="card-footer-v3">Cartela No: {card.id}</div>
             </div>
         );
     };
