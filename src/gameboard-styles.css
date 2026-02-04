@@ -973,3 +973,17 @@ input:checked+.slider-v3:before {
         flex: none;
     }
 }
+/* RIGHT COLUMN SCROLL & GRID */
+.game-main-v3 {
+    overflow-y: auto;
+    padding-right: 4px;
+    padding-bottom: 80px;
+}
+
+.cards-stack-v3 {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    width: 100%;
+}
+
