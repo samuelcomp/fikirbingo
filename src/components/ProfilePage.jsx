@@ -64,13 +64,6 @@ const ProfilePage = ({ user, lang, onToggleLang, onLogout, t }) => {
                 </div>
             </div>
 
-            <div className="invite-banner-v2">
-                <h3>Invite Friends</h3>
-                <p>Earn 2% of their deposits forever!</p>
-                <button className="copy-link-btn">
-                    Copy Invite Link
-                </button>
-            </div>
         </div>
     );
 };

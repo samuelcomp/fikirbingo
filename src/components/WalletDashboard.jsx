@@ -99,44 +99,16 @@ const WalletDashboard = ({ user, onUpdateUser, t }) => {
                     >
                         <div className="balance-cards-grid-v4">
                             <motion.div
-                                className="balance-card-v4 main"
-                                whileHover={{ scale: 1.02 }}
+                                className="balance-card-v4 main full-width"
+                                whileHover={{ scale: 1.01 }}
                                 transition={{ type: "spring", stiffness: 300 }}
                             >
                                 <div className="card-icon-circle">
                                     <Wallet />
                                 </div>
-                                <div className="card-label-v4">Main Balance</div>
+                                <div className="card-label-v4">Wallet Balance</div>
                                 <div className="card-amount-v4">
                                     {user?.mainBalance || 0} <span>Birr</span>
-                                </div>
-                            </motion.div>
-
-                            <motion.div
-                                className="balance-card-v4 play"
-                                whileHover={{ scale: 1.02 }}
-                                transition={{ type: "spring", stiffness: 300 }}
-                            >
-                                <div className="card-icon-circle">
-                                    <ArrowRightLeft />
-                                </div>
-                                <div className="card-label-v4">Play Wallet</div>
-                                <div className="card-amount-v4">
-                                    {user?.playBalance || 0} <span>Birr</span>
-                                </div>
-                            </motion.div>
-
-                            <motion.div
-                                className="balance-card-v4 coins"
-                                whileHover={{ scale: 1.02 }}
-                                transition={{ type: "spring", stiffness: 300 }}
-                            >
-                                <div className="card-icon-circle">
-                                    <Coins />
-                                </div>
-                                <div className="card-label-v4">Loyalty Coins</div>
-                                <div className="card-amount-v4">
-                                    {user?.loyaltyCoins || 0} <span>Coins</span>
                                 </div>
                             </motion.div>
                         </div>
@@ -173,8 +145,10 @@ const WalletDashboard = ({ user, onUpdateUser, t }) => {
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: idx * 0.05 }}
                                     >
-                                        <div className={`tx-icon-v4 ${tx.type === 'DEPOSIT' ? 'deposit' : 'withdraw'}`}>
-                                            {tx.type === 'DEPOSIT' ? <ArrowDownLeft size={20} /> : <ArrowUpRight size={20} />}
+                                        <div className={`tx-icon-v4 ${tx.type === 'DEPOSIT' || tx.type === 'WIN' || tx.type === 'REFUND' ? 'deposit' : 'withdraw'
+                                            }`}>
+                                            {tx.type === 'DEPOSIT' || tx.type === 'WIN' || tx.type === 'REFUND' ?
+                                                <ArrowDownLeft size={20} /> : <ArrowUpRight size={20} />}
                                         </div>
                                         <div className="tx-info-v4">
                                             <span className="tx-type-v4">{tx.type}</span>
@@ -185,8 +159,9 @@ const WalletDashboard = ({ user, onUpdateUser, t }) => {
                                             </span>
                                         </div>
                                         <div className="tx-right-v4">
-                                            <div className={`tx-amount-v4 ${tx.type === 'DEPOSIT' ? 'deposit' : 'withdraw'}`}>
-                                                {tx.type === 'DEPOSIT' ? '+' : '-'}{tx.amount}
+                                            <div className={`tx-amount-v4 ${tx.type === 'DEPOSIT' || tx.type === 'WIN' || tx.type === 'REFUND' ? 'deposit' : 'withdraw'
+                                                }`}>
+                                                {tx.type === 'DEPOSIT' || tx.type === 'WIN' || tx.type === 'REFUND' ? '+' : '-'}{tx.amount}
                                             </div>
                                             <span className={`status-badge-v4 ${tx.status.toLowerCase()}`}>
                                                 {tx.status}
