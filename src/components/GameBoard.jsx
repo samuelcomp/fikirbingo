@@ -83,8 +83,12 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                 if (data.calledNumbers?.length > 0) {
                     setCurrentBall(data.calledNumbers[data.calledNumbers.length - 1]);
                 }
-                if (data.winnerData && data.winnerData.length > 0) {
-                    setWinner(prev => (prev && prev.length > 0) ? prev : data.winnerData);
+
+                // CRITICAL: Clear winner if status is not FINISHED or no winner data
+                if (data.status !== 'FINISHED' || !data.winnerData || data.winnerData.length === 0) {
+                    setWinner(null);
+                } else {
+                    setWinner(data.winnerData);
                 }
             }
         });
@@ -108,19 +112,21 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                     prizePool: data.prizePool,
                     resetIn: data.resetIn || 0
                 }));
-                if (data.winnerData && data.winnerData.length > 0) {
-                    setWinner(prev => (prev && prev.length > 0) ? prev : data.winnerData);
+
+                // CRITICAL: Use the status to decide if we should show winners
+                if (data.status === 'FINISHED' && data.winnerData && data.winnerData.length > 0) {
+                    setWinner(prev => (prev && prev.length > 0 && prev[0].username) ? prev : data.winnerData);
+                } else if (data.status !== 'FINISHED') {
+                    setWinner(null);
                 }
             }
         });
 
         s.on('player_won', (data) => {
             console.log('🏆 Winner data received via EVENT:', data);
-            setWinner(prev => {
-                // If we already have winner data with usernames, don't overwrite with less data
-                if (prev && prev.length > 0 && prev[0].username && !data[0].username) return prev;
-                return data;
-            });
+            if (data && data.length > 0) {
+                setWinner(data);
+            }
         });
 
         s.on('game_reset', () => {
