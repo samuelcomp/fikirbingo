@@ -36,6 +36,10 @@ function App() {
     const t = translations[lang];
 
     useEffect(() => {
+        if (window.Telegram?.WebApp) {
+            window.Telegram.WebApp.ready();
+            window.Telegram.WebApp.expand();
+        }
         initApp();
     }, []);
 
@@ -43,9 +47,22 @@ function App() {
         if (user?.id) fetchUserProfile();
     }, [view, stake]);
 
+    const fetchWithRetry = async (url, options = {}, retries = 3, delay = 1000) => {
+        for (let i = 0; i < retries; i++) {
+            try {
+                return await axios(url, options);
+            } catch (err) {
+                if (i === retries - 1) throw err;
+                console.warn(`[Retry] Attempt ${i + 1} failed for ${url}. Retrying in ${delay}ms...`);
+                await new Promise(r => setTimeout(r, delay));
+                delay *= 2; // Exponential backoff
+            }
+        }
+    };
+
     const initApp = async () => {
         try {
-            const brandRes = await axios.get(`${API_URL}/api/branding`);
+            const brandRes = await fetchWithRetry(`${API_URL}/api/branding`);
             setBranding(brandRes.data);
 
             const initData = window.Telegram?.WebApp?.initData;
@@ -56,7 +73,11 @@ function App() {
             if (initData || (isLocalhost && !token)) {
                 console.log(`[App] Auth with ${initData ? 'initData' : 'Dev Auth (localhost)'}`);
                 try {
-                    const authRes = await axios.post(`${API_URL}/api/auth`, { initData });
+                    const authRes = await fetchWithRetry({
+                        method: 'post',
+                        url: `${API_URL}/api/auth`,
+                        data: { initData }
+                    });
                     localStorage.setItem('userToken', authRes.data.token);
                     setUser(authRes.data.user);
                     setMustRegister(authRes.data.mustRegister);
@@ -74,11 +95,10 @@ function App() {
                 console.log('[App] Auth with token');
                 fetchUserProfile();
             } else {
-                // No token, no initData, not localhost - might be a regular browser visit to ngrok
                 console.log('[App] No auth source found');
             }
         } catch (e) {
-            console.error('Initialization failed', e);
+            console.error('Initialization failed final attempt', e);
         } finally {
             setIsLoading(false);
         }
@@ -88,7 +108,7 @@ function App() {
         try {
             const token = localStorage.getItem('userToken');
             if (token) {
-                const res = await axios.get(`${API_URL}/api/profile`, {
+                const res = await fetchWithRetry(`${API_URL}/api/profile`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 setUser(res.data);

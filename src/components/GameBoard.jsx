@@ -38,15 +38,34 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
         const token = localStorage.getItem('userToken');
         if (!token || !user?.id) return;
 
+        console.log(`[Socket] Initializing connection to ${API_URL}...`);
         const s = io(API_URL, {
             auth: { token },
-            extraHeaders: { "ngrok-skip-browser-warning": "true" }
+            extraHeaders: { "ngrok-skip-browser-warning": "true" },
+            reconnection: true,
+            reconnectionAttempts: 10,
+            reconnectionDelay: 1000,
+            timeout: 20000,
+            transports: ['polling', 'websocket'] // Force polling first for better ngrok bypass
         });
         setSocket(s);
 
-        s.on('connect', () => console.log('[Socket] Connected to server! Socket ID:', s.id));
-        s.on('connect_error', (err) => console.error('[Socket] Connection failed:', err.message));
-        s.on('disconnect', (reason) => console.warn('[Socket] Disconnected:', reason));
+        s.on('connect', () => {
+            console.log('[Socket] Connected! Socket ID:', s.id);
+        });
+
+        s.on('connect_error', (err) => {
+            console.error('[Socket] Connection error:', err.message);
+            if (err.message === 'Authentication error: Invalid token') {
+                // If token is invalid, maybe it was refreshed in App.jsx but this effect didn't pick it up
+                // We don't want to force a reload, but maybe a reconnect?
+                console.warn('[Socket] Token invalid, attempting to sync with localStorage...');
+            }
+        });
+
+        s.on('disconnect', (reason) => {
+            console.warn('[Socket] Disconnected:', reason);
+        });
 
         s.emit('join_room', { roomId });
 
@@ -64,8 +83,8 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                 if (data.calledNumbers?.length > 0) {
                     setCurrentBall(data.calledNumbers[data.calledNumbers.length - 1]);
                 }
-                if (data.winnerData) {
-                    setWinner(data.winnerData);
+                if (data.winnerData && data.winnerData.length > 0) {
+                    setWinner(prev => (prev && prev.length > 0) ? prev : data.winnerData);
                 }
             }
         });
@@ -89,15 +108,19 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                     prizePool: data.prizePool,
                     resetIn: data.resetIn || 0
                 }));
-                if (data.winnerData !== undefined) {
-                    setWinner(data.winnerData);
+                if (data.winnerData && data.winnerData.length > 0) {
+                    setWinner(prev => (prev && prev.length > 0) ? prev : data.winnerData);
                 }
             }
         });
 
         s.on('player_won', (data) => {
             console.log('🏆 Winner data received via EVENT:', data);
-            setWinner(data);
+            setWinner(prev => {
+                // If we already have winner data with usernames, don't overwrite with less data
+                if (prev && prev.length > 0 && prev[0].username && !data[0].username) return prev;
+                return data;
+            });
         });
 
         s.on('game_reset', () => {
