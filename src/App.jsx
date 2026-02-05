@@ -30,6 +30,7 @@ function App() {
     const [selectedCartelas, setSelectedCartelas] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [mustRegister, setMustRegister] = useState(false);
+    const [isWhitelistBlocked, setIsWhitelistBlocked] = useState(false);
     const [lang, setLang] = useState('en');
 
     const t = translations[lang];
@@ -54,13 +55,20 @@ function App() {
 
             if (initData || (isLocalhost && !token)) {
                 console.log(`[App] Auth with ${initData ? 'initData' : 'Dev Auth (localhost)'}`);
-                const authRes = await axios.post(`${API_URL}/api/auth`, { initData });
-                localStorage.setItem('userToken', authRes.data.token);
-                setUser(authRes.data.user);
-                setMustRegister(authRes.data.mustRegister);
+                try {
+                    const authRes = await axios.post(`${API_URL}/api/auth`, { initData });
+                    localStorage.setItem('userToken', authRes.data.token);
+                    setUser(authRes.data.user);
+                    setMustRegister(authRes.data.mustRegister);
 
-                if (!authRes.data.mustRegister && view === 'register') {
-                    setView('landing');
+                    if (!authRes.data.mustRegister && view === 'register') {
+                        setView('landing');
+                    }
+                } catch (err) {
+                    if (err.response?.data?.isWhitelistBlock) {
+                        setIsWhitelistBlocked(true);
+                    }
+                    throw err;
                 }
             } else if (token) {
                 console.log('[App] Auth with token');
@@ -90,6 +98,9 @@ function App() {
             }
         } catch (e) {
             console.error('Profile fetch failed');
+            if (e.response?.data?.isWhitelistBlock) {
+                setIsWhitelistBlocked(true);
+            }
         }
     };
 
@@ -197,6 +208,21 @@ function App() {
                     <h1>🚧 Under Maintenance</h1>
                     <p>Fikir Bingo is currently undergoing scheduled maintenance. Please check back later.</p>
                     <p>ጥገና ላይ ነን። እባክዎ ቆይተው ይሞክሩ።</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (isWhitelistBlocked) {
+        return (
+            <div className="access-denied-screen">
+                <div className="denied-card upscale-reveal">
+                    <h1>⛔ Access Restricted</h1>
+                    <p>እባክዎ ሲስተም አድሚኒስትሬተሩን ያግኙ። በአሁኑ ሰዓት መተግበሪያውን መጠቀም አይችሉም።</p>
+                    <p>(Please contact system administrator. Your access is currently restricted.)</p>
+                    <div className="qr-placeholder" style={{ padding: '20px' }}>
+                        <div className="bot-link">Support: @BetesebSupport</div>
+                    </div>
                 </div>
             </div>
         );

@@ -219,15 +219,18 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
                     <div className="sidebar-header-label-v3">RECENT</div>
                     <div className="top-feedback-v3">
                         <div className="recent-draws-v3">
-                            <AnimatePresence>
-                                {gameState.calledNumbers.slice(-3).reverse().map((num, i) => (
+                            <AnimatePresence mode="popLayout">
+                                {gameState.calledNumbers.slice(-3).reverse().map((num) => (
                                     <motion.div
                                         key={num}
                                         className="recent-ball-v3"
-                                        initial={{ x: 20, opacity: 0, scale: 0.5 }}
+                                        initial={{ x: 50, opacity: 0, scale: 0.8 }}
                                         animate={{ x: 0, opacity: 1, scale: 1 }}
-                                        exit={{ x: -20, opacity: 0, scale: 0.5 }}
-                                        transition={{ type: 'spring', damping: 15, stiffness: 200 }}
+                                        exit={{ x: -50, opacity: 0, scale: 0.8 }}
+                                        transition={{
+                                            duration: 0.6,
+                                            ease: [0.22, 1, 0.36, 1]
+                                        }}
                                         style={{ backgroundColor: getBallColor(num) }}
                                     >
                                         {getBallLetter(num)}-{num}
@@ -330,121 +333,83 @@ const GameBoard = ({ user, roomId = 'room-10', selectedCartelas = [], onGameOver
             </footer>
 
             {/* Winner Overlay - Enhanced with Animations */}
+            {/* Premium Winner Overlay */}
             <AnimatePresence>
                 {winner && (Array.isArray(winner) ? winner.length > 0 : true) && (
                     <motion.div
-                        className="bingo-modal-overlay"
+                        className="bingo-overlay-v5"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        transition={{ duration: 0.3 }}
                     >
                         <motion.div
-                            className="bingo-modal-content upscale-reveal-v4 gold-border-prestige"
-                            initial={{ scale: 0.5, opacity: 0, y: 50 }}
+                            className="winner-modal-v5 gold-prestige-v5 upscale-reveal-v4"
+                            initial={{ scale: 0.8, opacity: 0, y: 100 }}
                             animate={{ scale: 1, opacity: 1, y: 0 }}
-                            exit={{ scale: 0.8, opacity: 0, y: 20 }}
-                            transition={{
-                                type: "spring",
-                                stiffness: 200,
-                                damping: 20,
-                                duration: 0.5
-                            }}
+                            exit={{ scale: 0.8, opacity: 0, y: 50 }}
+                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
                         >
-                            <motion.div
-                                className="crown-circle-v4"
-                                initial={{ scale: 0, rotate: -180 }}
-                                animate={{ scale: 1, rotate: 0 }}
-                                transition={{
-                                    delay: 0.2,
-                                    type: "spring",
-                                    stiffness: 150
-                                }}
-                            >
-                                <Trophy size={40} className="crown-svg-v4" />
-                            </motion.div>
-
-                            <motion.h1
-                                className="bingo-title-v4"
-                                initial={{ scale: 0.5, opacity: 0 }}
-                                animate={{ scale: 1, opacity: 1 }}
-                                transition={{ delay: 0.3, duration: 0.4 }}
-                            >
-                                BINGO!
-                            </motion.h1>
-
-                            <div className="winners-list-v4">
-                                {(Array.isArray(winner) ? winner : [winner]).map((w, idx) => {
-                                    if (!w) return null;
-                                    return (
-                                        <motion.div
-                                            key={idx}
-                                            className="winner-presentation-v4"
-                                            initial={{ opacity: 0, x: -20 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: 0.4 + idx * 0.1 }}
-                                        >
-                                            <div className="winner-label-v4">
-                                                🎉 <span className="name-v4">{w.username || 'Player'} WON!</span> 🎉
-                                            </div>
-
-                                            <div className="card-box-v4">
-                                                <div className="card-header-v4">
-                                                    <Trophy size={14} /> Winning Cartela : {w.cartelaId || '...'}
-                                                </div>
-                                                <div className="grid-5x5-v4">
-                                                    {['B', 'I', 'N', 'G', 'O'].map((col, cIdx) => (
-                                                        <div key={col} className="col-v4">
-                                                            <div className="header-v4" style={{ backgroundColor: getBallColor(cIdx * 15 + 1) }}>{col}</div>
-                                                            {(w.officialCard?.[col] || []).map((num, i) => {
-                                                                const isMarked = gameState.calledNumbers.includes(num) || num === 'FREE';
-                                                                return (
-                                                                    <div key={i} className={`cell-v4 ${isMarked ? 'marked' : ''}`}>
-                                                                        {num === 'FREE' ? '✨' : num}
-                                                                    </div>
-                                                                );
-                                                            })}
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-
-                                            <motion.div
-                                                className="prize-pill-v4"
-                                                initial={{ scale: 0.8, opacity: 0 }}
-                                                animate={{ scale: 1, opacity: 1 }}
-                                                transition={{ delay: 0.6 + idx * 0.1 }}
-                                            >
-                                                <span className="p-lbl">PRIZE:</span> {w.prize || 0} <small>Birr</small>
-                                            </motion.div>
-
-                                            {idx < (Array.isArray(winner) ? winner.length : 1) - 1 && <div className="winner-sep-v4" />}
-                                        </motion.div>
-                                    );
-                                })}
+                            <div className="victory-crown-v5">
+                                <Trophy size={48} />
                             </div>
 
-                            <motion.div
-                                className="auto-start-pill-v4"
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.7 }}
+                            <motion.h2
+                                className="victory-title-v5"
+                                initial={{ letterSpacing: "12px", opacity: 0 }}
+                                animate={{ letterSpacing: "2px", opacity: 1 }}
+                                transition={{ delay: 0.3, duration: 0.6 }}
                             >
-                                <div className="dot-v4 pulsing"></div>
-                                Auto-starting next game in {gameState.resetIn || 0}s
-                            </motion.div>
+                                BINGO!
+                            </motion.h2>
 
-                            <motion.button
-                                className="prestige-continue-btn"
-                                onClick={() => onGameOver()}
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.8 }}
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                            >
-                                CONTINUE
-                            </motion.button>
+                            <div className="winners-list-v5">
+                                {(Array.isArray(winner) ? winner : [winner]).map((w, idx) => (
+                                    <motion.div
+                                        key={idx}
+                                        className="winner-card-v5"
+                                        initial={{ x: -20, opacity: 0 }}
+                                        animate={{ x: 0, opacity: 1 }}
+                                        transition={{ delay: 0.5 + idx * 0.1 }}
+                                    >
+                                        <div className="winner-user-v5">
+                                            <div className="winner-name-group-v5">
+                                                <span className="winner-uname-v5">@{w.username || 'Player'}</span>
+                                                <div className="winner-prize-v5">+{w.prize || 0} Birr</div>
+                                            </div>
+                                            <div className="winner-cartela-pill-v5">Cartela No: {w.cartelaId}</div>
+                                        </div>
+
+                                        <div className="winner-grid-v5">
+                                            {['B', 'I', 'N', 'G', 'O'].map((col, cIdx) => (
+                                                <div key={col} className="mini-col-v5">
+                                                    <div className="mini-col-head-v5" style={{ backgroundColor: getBallColor(cIdx * 15 + 1) }}>{col}</div>
+                                                    {(w.officialCard?.[col] || []).map((num, i) => {
+                                                        const isMarked = gameState.calledNumbers.includes(num) || num === 'FREE';
+                                                        return (
+                                                            <div key={i} className={`mini-cell-v5 ${isMarked ? 'hit' : ''}`}>
+                                                                {num === 'FREE' ? '★' : num}
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </motion.div>
+                                ))}
+                            </div>
+
+                            <div className="modal-footer-v5">
+                                <div className="auto-next-v5">
+                                    <div className="pulse-dot-v5"></div>
+                                    Next game in {gameState.resetIn || 0}s
+                                </div>
+                                <button className="modal-exit-btn-v5" onClick={() => onGameOver()}>
+                                    EXIT TO LOBBY
+                                </button>
+                                <button className="modal-stay-btn-v5" onClick={() => setWinner(null)}>
+                                    STAY HERE
+                                </button>
+                            </div>
                         </motion.div>
                     </motion.div>
                 )}
