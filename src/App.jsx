@@ -238,10 +238,14 @@ function App() {
             <div className="access-denied-screen">
                 <div className="denied-card upscale-reveal">
                     <h1>⛔ Access Restricted</h1>
+                    <div className="denied-icon">🛡️</div>
                     <p>እባክዎ ሲስተም አድሚኒስትሬተሩን ያግኙ። በአሁኑ ሰዓት መተግበሪያውን መጠቀም አይችሉም።</p>
-                    <p>(Please contact system administrator. Your access is currently restricted.)</p>
-                    <div className="qr-placeholder" style={{ padding: '20px' }}>
-                        <div className="bot-link">Support: @BetesebSupport</div>
+                    <p>(Your access is currently restricted. Please contact the administrator to be whitelisted.)</p>
+
+                    <div className="support-actions">
+                        <a href="https://t.me/BetesebSupport" target="_blank" rel="noreferrer" className="support-btn">
+                            Contact Support
+                        </a>
                     </div>
                 </div>
             </div>

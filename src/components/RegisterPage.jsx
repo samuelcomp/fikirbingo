@@ -49,9 +49,12 @@ const RegisterPage = ({ onRegisterSuccess, t, API_URL }) => {
             onRegisterSuccess();
         } catch (e) {
             console.error("Contact save error:", e);
-            // Extract the specific backend error message (e.g. Whitelist Block)
-            const msg = e.response?.data?.error || "Failed to save contact. Please try again.";
-            alert(msg);
+            if (e.response?.data?.isWhitelistBlock) {
+                setError("whitelisted_only");
+            } else {
+                const msg = e.response?.data?.error || "Failed to save contact. Please try again.";
+                setError(msg);
+            }
         } finally {
             setIsLoading(false);
         }
@@ -66,12 +69,22 @@ const RegisterPage = ({ onRegisterSuccess, t, API_URL }) => {
                 <h1>{t.registrationTitle}</h1>
                 <p>{t.registrationDesc}</p>
 
-                {error && <p className="error-text">{error}</p>}
+                {error && error === "whitelisted_only" ? (
+                    <div className="whitelist-error-card">
+                        <p className="error-text">⛔ <b>Access Restricted:</b> Your number is not whitelisted.</p>
+                        <p className="error-text-am">ይህ ስልክ ቁጥር አልተፈቀደም። እባክዎ ድጋፍ ሰጪዎችን ያነጋግሩ።</p>
+                        <a href="https://t.me/BetesebSupport" target="_blank" rel="noreferrer" className="support-btn-mini">
+                            Contact Support
+                        </a>
+                    </div>
+                ) : (
+                    error && <p className="error-text">{error}</p>
+                )}
 
                 <button
                     className={`play-btn ${isLoading ? 'loading' : ''}`}
                     onClick={handleShareContact}
-                    disabled={isLoading}
+                    disabled={isLoading || error === "whitelisted_only"}
                 >
                     {isLoading ? (
                         <div className="spinner"></div>
