@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
-import { Wallet, CheckCircle, RotateCcw, Coins, ArrowRightLeft, ArrowDownLeft, ArrowUpRight, Clock, XCircle, AlertCircle, Receipt } from 'lucide-react';
+import { Wallet, CheckCircle, RotateCcw, ArrowRightLeft, ArrowDownLeft, ArrowUpRight, Clock, XCircle, AlertCircle, Receipt } from 'lucide-react';
 
 const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\s/g, '');
 
